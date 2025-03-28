@@ -1,0 +1,84 @@
+Configs: {
+	DataConfig: {
+		DisplayName: Data Config
+
+		RootSize: {
+			Label: Root Size
+			Tooltip: ""
+		}
+
+		CollectionsSize: {
+			Label: Collections Size
+			Tooltip: ""
+		}
+
+		Collections: {
+			Label: Collections
+			Tooltip: ""
+		}
+
+		CategoriesSizes: {
+			Label: Categories Sizes
+			Tooltip: ""
+		}
+
+		Categories: {
+			Label: Categories
+			Tooltip: ""
+		}
+
+		Folders: {
+			Label: Folders
+			Tooltip: ""
+		}
+
+		ModPaths: {
+			Label: Mod Paths
+			Tooltip: ""
+		}
+
+		Scale: {
+			Label: Scale
+			Tooltip: ""
+		}
+
+		ScaleThreshold: {
+			Label: Scale Threshold
+			Tooltip: ""
+		}
+
+		ScaleText: {
+			Label: Scale Text
+			Tooltip: ""
+		}
+
+		ModNames: {
+			Label: Mod Names
+			Tooltip: ""
+		}
+	}
+}
+
+Apply: Apply
+Confirm: Confirm
+Rename: Rename
+RenameTitle: Rename
+Cancel: Cancel
+Delete: Delete
+Remove: Remove
+Info: Info
+CantLeave: Please Apply or Reject changes before leave!
+DeleteDescMod: You can download it again in Mod Browser
+DeleteDescFolder: All files will be moved to current directory
+DeleteTitle: Deletion Confirmation
+CreateFolder: Create Folder
+Enable: Enable
+Disable: Disable
+CreateCollection: Create Collection
+NoActions: No actions available
+ClickToReturn: Click To Return
+ButtonConfig: Open Config
+ButtonApplyChanges: Apply Changes
+ButtonRejectChanges: Reject Changes
+ButtonInfo: Mod Info
+SearchModsHint: Type to search mods

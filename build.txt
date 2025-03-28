@@ -1,0 +1,5 @@
+displayName = Mod Manager Alpha
+author = Drovyng
+version = 0.4-Alpha
+side = Client
+homepage = https://github.com/Drovyng/ModManager

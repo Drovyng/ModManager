@@ -1,0 +1,84 @@
+Configs: {
+	DataConfig: {
+		// DisplayName: Data Config
+
+		RootSize: {
+			// Label: Root Size
+			// Tooltip: ""
+		}
+
+		CollectionsSize: {
+			// Label: Collections Size
+			// Tooltip: ""
+		}
+
+		Collections: {
+			// Label: Collections
+			// Tooltip: ""
+		}
+
+		CategoriesSizes: {
+			// Label: Categories Sizes
+			// Tooltip: ""
+		}
+
+		Categories: {
+			// Label: Categories
+			// Tooltip: ""
+		}
+
+		Folders: {
+			// Label: Folders
+			// Tooltip: ""
+		}
+
+		ModPaths: {
+			// Label: Mod Paths
+			// Tooltip: ""
+		}
+
+		Scale: {
+			// Label: Scale
+			// Tooltip: ""
+		}
+
+		ScaleThreshold: {
+			// Label: Scale Threshold
+			// Tooltip: ""
+		}
+
+		ScaleText: {
+			// Label: Scale Text
+			// Tooltip: ""
+		}
+
+		ModNames: {
+			// Label: Mod Names
+			// Tooltip: ""
+		}
+	}
+}
+
+Apply: Применить
+Confirm: Подтвердить
+Rename: Переименовать
+RenameTitle: Переименование
+Cancel: Отмена
+Delete: Удалить
+Remove: Убрать
+Info: Информация
+CantLeave: Пожалуйста Примените или Отклоните изменения беред выходом!
+DeleteDescMod: Вы можете скачать мод снова в Браузере Модов
+DeleteDescFolder: Все файлы будут перенесены в текущую директорию
+DeleteTitle: Подтверждение Удаления
+CreateFolder: Создать Папку
+Enable: Включить
+Disable: Выключить
+CreateCollection: Создать Коллекцию
+NoActions: Нет доступных действий
+ClickToReturn: Нажмите для Возврата
+ButtonConfig: Конфигурация
+ButtonApplyChanges: Применить Изменения
+ButtonRejectChanges: Отклонить Изменения
+ButtonInfo: Информация
+SearchModsHint: Введите для поиска модов
