@@ -4,11 +4,11 @@ This mod is intended to improve the experience of interacting with the tModLoade
 
 [hr]
 [h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   MODS LIST UPGRADE[/h1]
-[h2]Showcase: Scaling[/h2][img]https://i.imgur.com/hTeidMr.mp4[/img]
-[h2]Showcase: Filters[/h2][img]https://i.imgur.com/GX7KrGl.mp4[/img]
-[h2]Showcase: Renaming[/h2][img]https://i.imgur.com/dXlHFQk.mp4[/img]
-[h2]Showcase: Folders And Paths[/h2][img]https://i.imgur.com/STv1yK6.mp4[/img]
-[h2]Showcase: Collections[/h2][img]https://i.imgur.com/LCCzs4n.mp4[/img]
+[h2]Showcase: Scaling[/h2][video mp4=https://i.imgur.com/hTeidMr.mp4][/video]
+[h2]Showcase: Filters[/h2][video mp4=https://i.imgur.com/GX7KrGl.mp4][/video]
+[h2]Showcase: Renaming[/h2][video mp4=https://i.imgur.com/dXlHFQk.mp4][/video]
+[h2]Showcase: Folders And Paths[/h2][video mp4=https://i.imgur.com/STv1yK6.mp4][/video]
+[h2]Showcase: Collections[/h2][video mp4=https://i.imgur.com/LCCzs4n.mp4][/video]
 
 [hr]
 [h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀PLANS[/h1]
@@ -18,3 +18,5 @@ This mod is intended to improve the experience of interacting with the tModLoade
 [*] Add Other Mods Compatibility
 [*] etc...
 [/olist]
+[quote=tModLoader ModManager]
+Developed By Drovyng[/quote]
