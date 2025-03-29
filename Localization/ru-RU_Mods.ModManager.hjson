@@ -62,6 +62,35 @@ Configs: {
 			// Tooltip: ""
 		}
 	}
+
+	DataConfigBrowser: {
+		// DisplayName: Data Config Browser
+
+		RootSize: {
+			// Label: Root Size
+			// Tooltip: ""
+		}
+
+		CategoriesSizes: {
+			// Label: Categories Sizes
+			// Tooltip: ""
+		}
+
+		Scale: {
+			// Label: Scale
+			// Tooltip: ""
+		}
+
+		ScaleText: {
+			// Label: Scale Text
+			// Tooltip: ""
+		}
+
+		ScaleThreshold: {
+			// Label: Scale Threshold
+			// Tooltip: ""
+		}
+	}
 }
 
 Apply: Применить

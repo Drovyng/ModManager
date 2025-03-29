@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Terraria.UI;
 
-namespace ModManager.Content
+namespace ModManager.Content.ModsList
 {
     public class UIModsTableCategory : UIPanelSizeable
     {

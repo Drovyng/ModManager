@@ -13,7 +13,7 @@ using Terraria.ModLoader.UI;
 using Terraria;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace ModManager.Content
+namespace ModManager.Content.ModsList
 {
     public class UIModsConfigCollection : UIElement
     {
@@ -83,7 +83,7 @@ namespace ModManager.Content
             string text = Path.Combine(ConfigManager.ModConfigPath, "Collection_" + Text.text, path);
             if (config2.Mode == ConfigScope.ServerSide && ModNet.NetReloadActive)
             {
-                JsonConvert.PopulateObject(ModNet.pendingConfigs.Single((ModNet.NetConfig x) => x.modname == config2.Mod.Name && x.configname == config2.Name).json, config2, ConfigManager.serializerSettingsCompact);
+                JsonConvert.PopulateObject(ModNet.pendingConfigs.Single((x) => x.modname == config2.Mod.Name && x.configname == config2.Name).json, config2, ConfigManager.serializerSettingsCompact);
                 return;
             }
 

@@ -1,8 +1,2 @@
-Added collections for configs
-Added fast menu switcher
-Folders now can be moved into other folder
-Fixed search
-Added autothrow when have unsupported mods enabled
-Fixed mod references
-Fixed contect menu
-Redesigned Flags
+Fixed Offset
+Fixed Softlock

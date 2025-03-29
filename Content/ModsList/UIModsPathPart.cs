@@ -2,7 +2,7 @@
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent;
 
-namespace ModManager.Content
+namespace ModManager.Content.ModsList
 {
     public class UIModsPathPart : UIPanel
     {

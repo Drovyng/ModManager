@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ModManager.Content;
+using ModManager.Content.ModsList;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using ReLogic.Content;
@@ -10,11 +12,12 @@ using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
+using Terraria.Social.Steam;
 using Terraria.UI;
 
 namespace ModManager
 {
-	public class ModManager : Mod
+    public class ModManager : Mod
 	{
         public static ModManager Instance;
         public static Asset<Texture2D> AssetToggleOn;
@@ -32,7 +35,7 @@ namespace ModManager
         public static float SizedMouseRotation;
 
         public static readonly IList<string> BadMods = [
-            "ConciseModList", "SmartModManagement", "ModSideIcon"
+            "ConciseModList", "SmartModManagement", "ModSideIcon", "CompactMods"
         ];
         public override void Load()
         {
@@ -44,7 +47,7 @@ namespace ModManager
             }
             if (flag)
             {
-                throw new System.Exception("ModManager does not support this mods: [" + string.Join(",", badmods) + "]");
+                throw new Exception("ModManager does not support this mods: [" + string.Join(",", badmods) + "]");
             }
 
             Instance = this;
@@ -64,41 +67,33 @@ namespace ModManager
             On_Main.DrawCursor += Main_DrawCursor;
             On_Main.DoDraw += On_Main_DoDraw;
 
-            On_UserInterface.SetState += On_UserInterface_SetState;
-
             Interface.modsMenu = new UIModsNew();
             Interface.modBrowser.Append(new UIMMBottomPanel());
             Interface.modPacksMenu.Append(new UIMMBottomPanel());
             Interface.modSources.Append(new UIMMBottomPanel());
+
+            On_WorkshopHelper.QueryHelper.AQueryInstance.OnWorkshopQueryInitialized += AQueryInstance_OnWorkshopQueryInitialized;
         }
+
+        private void AQueryInstance_OnWorkshopQueryInitialized(On_WorkshopHelper.QueryHelper.AQueryInstance.orig_OnWorkshopQueryInitialized orig, object self, Steamworks.SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
+        {
+            (self as WorkshopHelper.QueryHelper.AQueryInstance).numberPages = Math.Min((self as WorkshopHelper.QueryHelper.AQueryInstance).numberPages, 100);
+        }
+
         /*
-        public override void PostSetupContent()
-        {
-            if (ModLoader.TryGetMod("CompatChecker", out Mod mod))
-            {
-                new ILHook(mod.Code.GetType("CompatChecker.CompatChecker").GetMethod("DrawInModsMenu", BindingFlags.NonPublic | BindingFlags.Instance), IL_CompatChecker_DrawInModsMenu);
-            }
-        }
-        private void IL_CompatChecker_DrawInModsMenu(ILContext il)
-        {
-            ILCursor c = new(il);
-            c = c.GotoNext(MoveType.Before, (p) => p.MatchStloc2());
-            c.EmitLdstr("The rewrited string");
-        }*/
-
-        private void On_UserInterface_SetState(On_UserInterface.orig_SetState orig, UserInterface self, UIState state)
-        {
-            if (!(state is UILoadMods) && self._currentState is UIModsNew unew)
-            {
-                if (unew.DoNotClose)
-                {
-                    unew.DoNotCloseCallback();
-                    return;
-                }
-            }
-            orig(self, state);
-        }
-
+public override void PostSetupContent()
+{
+   if (ModLoader.TryGetMod("CompatChecker", out Mod mod))
+   {
+       new ILHook(mod.Code.GetType("CompatChecker.CompatChecker").GetMethod("DrawInModsMenu", BindingFlags.NonPublic | BindingFlags.Instance), IL_CompatChecker_DrawInModsMenu);
+   }
+}
+private void IL_CompatChecker_DrawInModsMenu(ILContext il)
+{
+   ILCursor c = new(il);
+   c = c.GotoNext(MoveType.Before, (p) => p.MatchStloc2());
+   c.EmitLdstr("The rewrited string");
+}*/
         public static LocalizedText Get(string name)
         {
             return Language.GetText("Mods.ModManager." + name);

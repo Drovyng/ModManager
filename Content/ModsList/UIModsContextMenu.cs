@@ -10,7 +10,7 @@ using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace ModManager.Content
+namespace ModManager.Content.ModsList
 {
     public class UIModsContextMenu : UIPanelSizeable
     {
@@ -32,7 +32,7 @@ namespace ModManager.Content
             UseRight = true;
             MinHorizontal = 150;
             posY = 1;
-            
+
             UIModItemNew uIMod = null;
             UIModsCollection coll = null;
             UIModsConfigCollection colld = null;
@@ -59,7 +59,7 @@ namespace ModManager.Content
                     AddSeparator();
                 }
                 AddAction("Info", folder);
-                AddAction(folder ? "Enable" : (uIMod.mod.Enabled ? "Disable" : "Enable"), folder);
+                AddAction(folder ? "Enable" : uIMod.mod.Enabled ? "Disable" : "Enable", folder);
                 AddAction("Rename");
                 AddAction(UIModsNew.Instance.OpenedCollections ? "Remove" : "Delete");
             }

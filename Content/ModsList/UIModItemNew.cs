@@ -14,7 +14,7 @@ using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace ModManager.Content
+namespace ModManager.Content.ModsList
 {
     public class UIModItemNew : UIPanel
     {
@@ -81,7 +81,7 @@ namespace ModManager.Content
                     Logging.tML.Error("Unknown error", exception);
                 }
             }
-            
+
             icon = new UIImage(texture)
             {
                 ScaleToFit = true,
@@ -149,18 +149,18 @@ namespace ModManager.Content
                 };
                 Append(divider3);
 
-                References = mod.properties.modReferences.Select((BuildProperties.ModReference x) => x.mod).ToList();
+                References = mod.properties.modReferences.Select((x) => x.mod).ToList();
 
                 var availableMods = ModOrganizer.RecheckVersionsToLoad().ToList();
 
                 float offset = 8;
 
-                (string, Version) tuple = ModOrganizer.modsThatUpdatedSinceLastLaunch.FirstOrDefault(((string ModName, Version previousVersion) x) => x.ModName == mod.Name);
+                (string, Version) tuple = ModOrganizer.modsThatUpdatedSinceLastLaunch.FirstOrDefault((x) => x.ModName == mod.Name);
                 if (tuple.Item1 != null || tuple.Item2 != null)
                 {
                     var img1 = new UIImage(ModManager.AssetSettingsToggle)
                     {
-                        Color = (tuple.Item2 == null) ? Color.Green : new Color(6, 95, 212),
+                        Color = tuple.Item2 == null ? Color.Green : new Color(6, 95, 212),
                         NormalizedOrigin = Vector2.One * 0.5f,
                         VAlign = 0.5f,
                         HAlign = 1f,
@@ -174,13 +174,13 @@ namespace ModManager.Content
                 }
 
                 string dependentsOn = string.Join("\n", (from m in availableMods
-                                    where m.properties.RefNames(includeWeak: false).Any((string refName) => refName.Equals(mod.Name))
-                                    select m.Name).ToArray());
+                                                         where m.properties.RefNames(includeWeak: false).Any((refName) => refName.Equals(mod.Name))
+                                                         select m.Name).ToArray());
                 if (dependentsOn != "") dependentsOn = Language.GetTextValue("tModLoader.ModDependentsTooltip", "\n" + dependentsOn);
                 void GetDependencies(LocalMod _mod, HashSet<string> allDependencies)
                 {
                     if (_mod == null) return;
-                    string[] array4 = _mod.properties.modReferences.Select((BuildProperties.ModReference x) => x.mod).ToArray();
+                    string[] array4 = _mod.properties.modReferences.Select((x) => x.mod).ToArray();
                     foreach (string text4 in array4)
                     {
                         if (allDependencies.Add(text4))
@@ -270,7 +270,7 @@ namespace ModManager.Content
         }
         public void Set(bool? enabled = null)
         {
-            enabled ??= !mod.Enabled;  
+            enabled ??= !mod.Enabled;
 
             if (enabled == true)
             {
@@ -294,7 +294,7 @@ namespace ModManager.Content
             if (toggle != null)
             {
                 toggle._texture = mod.Enabled ? ModManager.AssetToggleOn : ModManager.AssetToggleOff;
-                toggle.Color = mod.Enabled != loaded ? Color.Gold : (mod.Enabled ? new Color(0.75f, 1f, 0.75f) : Color.White);
+                toggle.Color = mod.Enabled != loaded ? Color.Gold : mod.Enabled ? new Color(0.75f, 1f, 0.75f) : Color.White;
             }
             UIModsNew.Instance.AddCollections();
             UIModsNew.Instance.CheckChanged();
@@ -352,7 +352,7 @@ namespace ModManager.Content
                 textVersion.Width.Pixels = e[2].GetOuterDimensions().Width - 6;
                 textVersion.scale = scaleText;
                 divider2.Left.Pixels = textVersion.Left.Pixels - 8;
-                divider3.Left.Pixels = divider2.Left.Pixels + textVersion.Width.Pixels;
+                divider3.Left.Pixels = divider2.Left.Pixels + textVersion.Width.Pixels + 8;
             }
             icon.Top.Pixels = grid ? 10 : 3;
 
@@ -387,7 +387,7 @@ namespace ModManager.Content
                 Recalculate();
             }
             IgnoresMouseInteraction = UIModsNew.Instance.GrabbedItem == this;
-            BackgroundColor = UIModsNew.Instance.SelectedItem == this ? new Color(103, 112, 201) : (IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f);
+            BackgroundColor = UIModsNew.Instance.SelectedItem == this ? new Color(103, 112, 201) : IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f;
             BorderColor = UIModsNew.Instance.SelectedItem == this ? Color.Gold : Color.Black;
             if (UIModsNew.Instance.GrabbedItem != null)
             {
@@ -400,7 +400,7 @@ namespace ModManager.Content
                         UIModsNew.Instance.GrabbedFolder = string.Join("/", UIModsNew.Instance.OpenedPath) + "/" + Name + "/";
                     }
                     return;
-                } 
+                }
                 if (!IgnoresMouseInteraction)
                 {
                     var a = BackgroundColor.A;
@@ -478,7 +478,7 @@ namespace ModManager.Content
                                     DataConfig.Instance.Folders.Remove(item);
                                     DataConfig.Instance.Folders.Add(path.Replace("//", "/"));
                                 }
-                                else if (item.StartsWith(curPath)) 
+                                else if (item.StartsWith(curPath))
                                 {
                                     DataConfig.Instance.Folders.Remove(item);
                                     DataConfig.Instance.Folders.Add((path + item.Substring(curPath.Length)).Replace("//", "/"));

@@ -2,7 +2,7 @@
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace ModManager.Content
+namespace ModManager.Content.ModsList
 {
     public class UIModsCollection : UIElement
     {
@@ -62,10 +62,10 @@ namespace ModManager.Content
                 }
                 toggleEnable = toggled == 0;
 
-                Toggle = new UIImage(toggled == 0 ? ModManager.AssetToggleOff : (toggled == 1 ? ModManager.AssetToggleOn : ModManager.AssetToggleHalf))
+                Toggle = new UIImage(toggled == 0 ? ModManager.AssetToggleOff : toggled == 1 ? ModManager.AssetToggleOn : ModManager.AssetToggleHalf)
                 {
                     VAlign = 0.5f,
-                    Color = toggled == 0 ? Color.White : (toggled == 1 ? new Color(0.75f, 1f, 0.75f) : new Color(1f, 0.9f, 0.75f)),
+                    Color = toggled == 0 ? Color.White : toggled == 1 ? new Color(0.75f, 1f, 0.75f) : new Color(1f, 0.9f, 0.75f),
                     NormalizedOrigin = Vector2.One * 0.5f,
                     Left = { Pixels = 2 }
                 };
@@ -86,6 +86,7 @@ namespace ModManager.Content
                 {
                     UIModsNew.Instance.GrabbedFolder = "collections/" + Text.text;
                 }
+                //Terraria.Social.Steam.WorkshopHelper.MetadataKeys
                 return;
             }
             Panel.BackgroundColor = IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f;

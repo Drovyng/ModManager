@@ -18,7 +18,7 @@ using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace ModManager.Content
+namespace ModManager.Content.ModsList
 {
     public class UIModsNew : UIMods
     {
@@ -149,7 +149,7 @@ namespace ModManager.Content
         {
             if (SelectedItem == null) return;
             if (SelectedItem.mod != null)
-            { 
+            {
                 uIMods.Remove(SelectedItem);
                 ModOrganizer.DeleteMod(SelectedItem.mod);
             }
@@ -353,7 +353,8 @@ namespace ModManager.Content
             var elem232 = new UIPanel()
             {
                 Width = { Precent = 1, Pixels = -30 },
-                Height = { Precent = 0.5f }, VAlign = 1
+                Height = { Precent = 0.5f },
+                VAlign = 1
             };
             elem232.SetPadding(0);
             configCollecList = new()
@@ -542,7 +543,8 @@ namespace ModManager.Content
                     Left = { Pixels = 65 },
                     Top = { Pixels = 2 },
                     Height = { Pixels = 16 },
-                    text = "-", scale = 0.9f
+                    text = "-",
+                    scale = 0.9f
                 };
                 var textNameInternal = new UITextDots<string>()
                 {
@@ -550,7 +552,8 @@ namespace ModManager.Content
                     Left = { Pixels = 65 },
                     Top = { Pixels = 20 },
                     Height = { Pixels = 16 },
-                    text = "-", scale = 0.9f
+                    text = "-",
+                    scale = 0.9f
                 };
                 var textAuthor = new UITextDots<string>()
                 {
@@ -558,7 +561,8 @@ namespace ModManager.Content
                     Left = { Pixels = 65 },
                     Top = { Pixels = 38 },
                     Height = { Pixels = 16 },
-                    text = "-", scale = 0.9f
+                    text = "-",
+                    scale = 0.9f
                 };
                 var textVersion = new UITextDots<string>()
                 {
@@ -566,9 +570,11 @@ namespace ModManager.Content
                     Left = { Pixels = 65 },
                     Top = { Pixels = 56 },
                     Height = { Pixels = 16 },
-                    text = "v0.0.0", scale = 0.9f
+                    text = "v0.0.0",
+                    scale = 0.9f
                 };
-                ChangeSelection += () => {
+                ChangeSelection += () =>
+                {
                     textName.text = SelectedItem?.Name ?? "-";
                     textNameInternal.text = SelectedItem?.mod?.Name ?? "-";
                     if (textNameInternal.text != "-") textNameInternal.text += ".tmod";
@@ -604,7 +610,8 @@ namespace ModManager.Content
                     Top = { Pixels = 4 },
                     align = 0.5f
                 });
-                buttonConfig.OnLeftClick += (e, l) => {
+                buttonConfig.OnLeftClick += (e, l) =>
+                {
                     OnDeactivate();
                     Main.menuMode = Interface.modConfigListID;
                     Interface.modConfig.modderOnClose = () =>
@@ -613,7 +620,7 @@ namespace ModManager.Content
                     };
                     Interface.modConfig.openedFromModder = true;
                 };
-                ontopButtons.Append(buttonConfig);  
+                ontopButtons.Append(buttonConfig);
                 var buttonApply = new UIPanel()
                 {
                     Width = { Precent = 0.6f },
@@ -628,7 +635,8 @@ namespace ModManager.Content
                     Top = { Pixels = 4 },
                     align = 0.5f
                 });
-                buttonApply.OnLeftClick += (e, l) => {
+                buttonApply.OnLeftClick += (e, l) =>
+                {
                     var getAct = ModLoader.OnSuccessfulLoad;
                     ModLoader.OnSuccessfulLoad = () =>
                     {
@@ -653,7 +661,8 @@ namespace ModManager.Content
                     Top = { Pixels = 4 },
                     align = 0.5f
                 });
-                buttonReject.OnLeftClick += (e, l) => {
+                buttonReject.OnLeftClick += (e, l) =>
+                {
                     RejectChanges();
                 };
                 ontopButtons.Append(buttonReject);
@@ -716,7 +725,7 @@ namespace ModManager.Content
 
                 Append(CantLeave);
             }
-            
+
             AddCategories();
             RecalculatePath();
             AddCollections();
@@ -735,7 +744,7 @@ namespace ModManager.Content
         private static double StringCompare(string a, string b)
         {
             if (a == b) return 100;
-            if ((a.Length == 0) || (b.Length == 0)) return 0;
+            if (a.Length == 0 || b.Length == 0) return 0;
             double maxLen = a.Length > b.Length ? a.Length : b.Length;
             int minLen = a.Length < b.Length ? a.Length : b.Length;
             int sameCharAtIndex = 0;
@@ -768,7 +777,7 @@ namespace ModManager.Content
                 foreach (var mod in list)
                 {
                     mod.Active = mod.mod != null && (OpenedPath.Count == 0 || DataConfig.Instance.Collections[OpenedPath[0]].Contains(mod.mod.Name)) && IsModFiltered(mod);
-                    
+
                     if (!mod.Active) continue;
                     mainListIn.Append(mod);
                     mod.Activate();
@@ -890,6 +899,8 @@ namespace ModManager.Content
                 mod.Top.Pixels = pos.Y;
                 if (!grid) pos.Y += mod.GetOuterDimensions().Height;
             }
+            pos.Y = MathF.Max(pos.Y, mainList.GetInnerDimensions().Height);
+            mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();
             mainScrollbar.SetView(mainList.GetInnerDimensions().Height, pos.Y);
         }
@@ -999,7 +1010,7 @@ namespace ModManager.Content
                 {
                     item.LeftElem.Add(categoriesHorizontal.Elements[j]);
                 }
-                for (int j = i+1; j < Categories.Count - 1; j++)
+                for (int j = i + 1; j < Categories.Count - 1; j++)
                 {
                     item.RightElem.Add(categoriesHorizontal.Elements[j]);
                 }
