@@ -1,6 +1,6 @@
 displayName = Mod Manager Alpha
 author = Drovyng
-version = 0.4.1-Alpha
+version = 1.1.1
 side = Client
 homepage = https://github.com/Drovyng/ModManager
 sortBefore = ConciseModList, SmartModManagement, ModSideIcon
