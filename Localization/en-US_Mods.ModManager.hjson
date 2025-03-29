@@ -56,6 +56,11 @@ Configs: {
 			Label: Mod Names
 			Tooltip: ""
 		}
+
+		ConfigCollections: {
+			Label: Config Collections
+			Tooltip: ""
+		}
 	}
 }
 
@@ -75,6 +80,7 @@ CreateFolder: Create Folder
 Enable: Enable
 Disable: Disable
 CreateCollection: Create Collection
+CreateConfigCollection: Create Config Collection
 NoActions: No actions available
 ClickToReturn: Click To Return
 ButtonConfig: Open Config

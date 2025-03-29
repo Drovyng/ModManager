@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace ModManager.Content
@@ -21,7 +25,7 @@ namespace ModManager.Content
         public UITextDots<string> textName;
         public UITextDots<string> textAuthor;
         public UITextDots<string> textVersion;
-        public UITextDots<string> textSide;
+        public UIElement flagsMarkers;
 
         public UIImage divider1;
         public UIImage divider2;
@@ -37,6 +41,8 @@ namespace ModManager.Content
 
         public Vector2 grabbedPos = Vector2.Zero;
         public float grabbedListPos = 0;
+
+        public List<string> References;
 
         public UIModItemNew(LocalMod _mod)
         {
@@ -94,17 +100,13 @@ namespace ModManager.Content
             Append(textName);
             if (mod != null)
             {
-                toggle = new(mod.Enabled ? ModManager.AssetToggleOn : ModManager.AssetToggleOff)
+                flagsMarkers = new()
                 {
-                    ImageScale = 0.75f,
-                    NormalizedOrigin = Vector2.One * 0.5f,
-                    Color = mod.Enabled ? new Color(0.75f, 1f, 0.75f) : Color.White
+                    Width = { Pixels = 200f },
+                    Height = { Precent = 1 },
+                    HAlign = 1
                 };
-                toggle.OnLeftClick += (e, l) =>
-                {
-                    Set(null);
-                };
-                Append(toggle);
+                Append(flagsMarkers);
                 textAuthor = new()
                 {
                     text = mod.properties.author,
@@ -119,13 +121,6 @@ namespace ModManager.Content
                     Top = { Pixels = 4 }
                 };
                 Append(textVersion);
-                textSide = new()
-                {
-                    text = mod.properties.side.ToFriendlyString(),
-                    Height = { Precent = 1 },
-                    Top = { Pixels = 4 }
-                };
-                Append(textSide);
                 divider1 = new(TextureAssets.MagicPixel)
                 {
                     OverrideSamplerState = SamplerState.PointClamp,
@@ -153,12 +148,149 @@ namespace ModManager.Content
                     ScaleToFit = true
                 };
                 Append(divider3);
+
+                References = mod.properties.modReferences.Select((BuildProperties.ModReference x) => x.mod).ToList();
+
+                var availableMods = ModOrganizer.RecheckVersionsToLoad().ToList();
+
+                float offset = 8;
+
+                (string, Version) tuple = ModOrganizer.modsThatUpdatedSinceLastLaunch.FirstOrDefault(((string ModName, Version previousVersion) x) => x.ModName == mod.Name);
+                if (tuple.Item1 != null || tuple.Item2 != null)
+                {
+                    var img1 = new UIImage(ModManager.AssetSettingsToggle)
+                    {
+                        Color = (tuple.Item2 == null) ? Color.Green : new Color(6, 95, 212),
+                        NormalizedOrigin = Vector2.One * 0.5f,
+                        VAlign = 0.5f,
+                        HAlign = 1f,
+                        Left = { Pixels = -offset },
+                        Width = { Pixels = 22 },
+                        Height = { Pixels = 22 },
+                    };
+                    img1.OnUpdate += (_) => { if (img1.IsMouseHovering) UIModsNew.Instance.Tooltip = tuple.Item2 == null ? Language.GetTextValue("tModLoader.ModAddedSinceLastLaunchMessage") : Language.GetTextValue("tModLoader.ModAddedSinceLastLaunchMessage", tuple.Item2); };
+                    flagsMarkers.Append(img1);
+                    offset += 24;
+                }
+
+                string dependentsOn = string.Join("\n", (from m in availableMods
+                                    where m.properties.RefNames(includeWeak: false).Any((string refName) => refName.Equals(mod.Name))
+                                    select m.Name).ToArray());
+                if (dependentsOn != "") dependentsOn = Language.GetTextValue("tModLoader.ModDependentsTooltip", "\n" + dependentsOn);
+                void GetDependencies(LocalMod _mod, HashSet<string> allDependencies)
+                {
+                    if (_mod == null) return;
+                    string[] array4 = _mod.properties.modReferences.Select((BuildProperties.ModReference x) => x.mod).ToArray();
+                    foreach (string text4 in array4)
+                    {
+                        if (allDependencies.Add(text4))
+                        {
+                            GetDependencies(availableMods.Find((m) => m.Name == text4), allDependencies);
+                        }
+                    }
+                }
+                var deps = new HashSet<string>();
+                GetDependencies(mod, deps);
+                string dep = string.Join("\n", deps);
+                if (dep != "") dep = Language.GetTextValue("tModLoader.ModDependencyTooltip", "\n" + dep);
+                if (dep != "" && dependentsOn != "") dep += "\n\n";
+                dependentsOn = dep + dependentsOn;
+                if (dependentsOn != "")
+                {
+                    var img2 = new UIImage(UICommon.ButtonDepsTexture)
+                    {
+                        NormalizedOrigin = Vector2.One * 0.5f,
+                        VAlign = 0.5f,
+                        HAlign = 1f,
+                        Left = { Pixels = -offset },
+                        Width = { Pixels = 22 },
+                        Height = { Pixels = 22 },
+                    };
+                    img2.OnUpdate += (_) => { if (img2.IsMouseHovering) UIModsNew.Instance.Tooltip = dependentsOn; };
+                    flagsMarkers.Append(img2);
+                    offset += 24;
+                }
+
+                if (mod.properties.RefNames(includeWeak: true).Any() && mod.properties.translationMod)
+                {
+                    var s = Language.GetTextValue("tModLoader.TranslationModTooltip", string.Join("\n ", mod.properties.RefNames(includeWeak: true)));
+                    var img3 = new UIImage(UICommon.ButtonTranslationModTexture)
+                    {
+                        NormalizedOrigin = Vector2.One * 0.5f,
+                        VAlign = 0.5f,
+                        HAlign = 1f,
+                        Left = { Pixels = -offset },
+                        Width = { Pixels = 22 },
+                        Height = { Pixels = 22 },
+                    };
+                    img3.OnUpdate += (_) => { if (img3.IsMouseHovering) UIModsNew.Instance.Tooltip = s; };
+                    flagsMarkers.Append(img3);
+                    offset += 24;
+                }
+                if (mod.properties.side == ModSide.Server || mod.properties.side == ModSide.Both)
+                {
+                    var img4 = new UIImage(ModManager.AssetIconServer)
+                    {
+                        NormalizedOrigin = Vector2.One * 0.5f,
+                        VAlign = 0.5f,
+                        HAlign = 1f,
+                        Left = { Pixels = -offset },
+                        Width = { Pixels = 22 },
+                        Height = { Pixels = 22 },
+                    };
+                    flagsMarkers.Append(img4);
+                    offset += 24;
+                }
+                if (mod.properties.side == ModSide.Client || mod.properties.side == ModSide.Both)
+                {
+                    var img5 = new UIImage(ModManager.AssetIconClient)
+                    {
+                        NormalizedOrigin = Vector2.One * 0.5f,
+                        VAlign = 0.5f,
+                        HAlign = 1f,
+                        Left = { Pixels = -offset },
+                        Width = { Pixels = 22 },
+                        Height = { Pixels = 22 },
+                    };
+                    flagsMarkers.Append(img5);
+                }
+                toggle = new(mod.Enabled ? ModManager.AssetToggleOn : ModManager.AssetToggleOff)
+                {
+                    ImageScale = 0.75f,
+                    NormalizedOrigin = Vector2.One * 0.5f,
+                    Color = mod.Enabled ? new Color(0.75f, 1f, 0.75f) : Color.White
+                };
+                toggle.OnLeftClick += (e, l) =>
+                {
+                    Set(null);
+                };
+                Append(toggle);
             }
             Redesign();
         }
         public void Set(bool? enabled = null)
         {
-            mod.Enabled = enabled ?? !mod.Enabled;
+            enabled ??= !mod.Enabled;  
+
+            if (enabled == true)
+            {
+                var l = References.ToList();
+                foreach (var item in UIModsNew.Instance.uIMods)
+                {
+                    if (item.mod != null && l.Contains(item.mod.Name))
+                    {
+                        item.Set(true);
+                        l.Remove(item.mod.Name);
+                    }
+                }
+                if (l.Count != 0)
+                {
+                    System.Windows.Forms.MessageBox.Show("Missing mods: " + string.Join(",", l), "Missing Mods", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+            }
+            mod.Enabled = enabled.Value;
+
             if (toggle != null)
             {
                 toggle._texture = mod.Enabled ? ModManager.AssetToggleOn : ModManager.AssetToggleOff;
@@ -192,7 +324,7 @@ namespace ModManager.Content
                 {
                     textAuthor.Remove();
                     textVersion.Remove();
-                    textSide.Remove();
+                    flagsMarkers.Remove();
                     divider1.Remove();
                     divider2.Remove();
                     divider3.Remove();
@@ -201,7 +333,7 @@ namespace ModManager.Content
                 {
                     Append(textAuthor);
                     Append(textVersion);
-                    Append(textSide);
+                    Append(flagsMarkers);
                     Append(divider1);
                     Append(divider2);
                     Append(divider3);
@@ -220,11 +352,7 @@ namespace ModManager.Content
                 textVersion.Width.Pixels = e[2].GetOuterDimensions().Width - 6;
                 textVersion.scale = scaleText;
                 divider2.Left.Pixels = textVersion.Left.Pixels - 8;
-
-                textSide.Left.Pixels = textVersion.Left.Pixels + textVersion.Width.Pixels + 6;
-                textSide.Width.Pixels = e[3].GetOuterDimensions().Width - 6;
-                textSide.scale = scaleText;
-                divider3.Left.Pixels = textSide.Left.Pixels - 8;
+                divider3.Left.Pixels = divider2.Left.Pixels + textVersion.Width.Pixels;
             }
             icon.Top.Pixels = grid ? 10 : 3;
 
@@ -236,6 +364,7 @@ namespace ModManager.Content
         }
         public override void Update(GameTime gameTime)
         {
+            //Tooltip = null;
             base.Update(gameTime);
 
             if (timetograb > 0)
@@ -262,7 +391,7 @@ namespace ModManager.Content
             BorderColor = UIModsNew.Instance.SelectedItem == this ? Color.Gold : Color.Black;
             if (UIModsNew.Instance.GrabbedItem != null)
             {
-                if (mod == null)
+                if (mod == null && UIModsNew.Instance.GrabbedItem != this)
                 {
                     BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
                     BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;
@@ -300,7 +429,7 @@ namespace ModManager.Content
             UIModsNew.Instance.ChangeSelection();
             if (!UIModsNew.Instance.OpenedCollections)
             {
-                timetograb = mod == null ? -2 : 0.4f;
+                timetograb = 0.4f;
                 grabbedPos = Main.MouseScreen;
                 grabbedListPos = UIModsNew.Instance.mainScrollbar._viewPosition;
             }
@@ -322,13 +451,41 @@ namespace ModManager.Content
                     var path = UIModsNew.Instance.GrabbedFolder;
                     if (path.StartsWith("collections/"))
                     {
-                        if (!DataConfig.Instance.Collections[path.Substring(12)].Contains(mod.Name))
+                        if (mod != null && !DataConfig.Instance.Collections[path.Substring(12)].Contains(mod.Name))
                             DataConfig.Instance.Collections[path.Substring(12)].Add(mod.Name);
                     }
                     else
                     {
                         if (!path.StartsWith("/")) path = "/" + path;
-                        DataConfig.Instance.ModPaths[mod?.Name ?? Name] = path;
+
+                        if (mod == null)
+                        {
+                            path += "/" + Name;
+                            var curPath = string.Join("/", UIModsNew.Instance.OpenedPath) + "/" + Name;
+                            if (!curPath.StartsWith("/")) curPath = "/" + curPath;
+
+                            var vls = DataConfig.Instance.ModPaths.ToList();
+                            foreach (var item in vls)
+                            {
+                                if (item.Value == curPath) DataConfig.Instance.ModPaths[item.Key] = path.Replace("//", "/");
+                                else if (item.Value.StartsWith(curPath)) DataConfig.Instance.ModPaths[item.Key] = (path + item.Value.Substring(curPath.Length)).Replace("//", "/");
+                            }
+                            var vls2 = DataConfig.Instance.Folders.ToList();
+                            foreach (var item in vls2)
+                            {
+                                if (item == curPath)
+                                {
+                                    DataConfig.Instance.Folders.Remove(item);
+                                    DataConfig.Instance.Folders.Add(path.Replace("//", "/"));
+                                }
+                                else if (item.StartsWith(curPath)) 
+                                {
+                                    DataConfig.Instance.Folders.Remove(item);
+                                    DataConfig.Instance.Folders.Add((path + item.Substring(curPath.Length)).Replace("//", "/"));
+                                }
+                            }
+                        }
+                        else DataConfig.Instance.ModPaths[mod?.Name ?? Name] = path;
                     }
                     DataConfig.Instance.Save();
                 }

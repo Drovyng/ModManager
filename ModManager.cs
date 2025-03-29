@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,13 +24,34 @@ namespace ModManager
         public static Asset<Texture2D> AssetSizeCursor;
         public static Asset<Texture2D> AssetSizeCursorBG;
         public static Asset<Texture2D> AssetModIcon;
+        public static Asset<Texture2D> AssetSettingsToggle;
+        public static Asset<Texture2D> AssetIconServer;
+        public static Asset<Texture2D> AssetIconClient;
 
         public static bool SizedMouse;
         public static float SizedMouseRotation;
+
+        public static readonly IList<string> BadMods = [
+            "ConciseModList", "SmartModManagement", "ModSideIcon"
+        ];
         public override void Load()
         {
+            List<string> badmods = new();
+            bool flag = false;
+            foreach (var item in ModLoader.Mods)
+            {
+                if (BadMods.Contains(item.Name)) { badmods.Add(item.DisplayNameClean); flag = true; }
+            }
+            if (flag)
+            {
+                throw new System.Exception("ModManager does not support this mods: [" + string.Join(",", badmods) + "]");
+            }
+
             Instance = this;
 
+            AssetIconServer = Assets.Request<Texture2D>("Assets/ServerIcon", AssetRequestMode.ImmediateLoad);
+            AssetIconClient = Assets.Request<Texture2D>("Assets/ClientIcon", AssetRequestMode.ImmediateLoad);
+            AssetSettingsToggle = Assets.Request<Texture2D>("Assets/Settings_Toggle", AssetRequestMode.ImmediateLoad);
             AssetToggleOn = Assets.Request<Texture2D>("Assets/ToggleOn", AssetRequestMode.ImmediateLoad);
             AssetToggleHalf = Assets.Request<Texture2D>("Assets/ToggleHalf", AssetRequestMode.ImmediateLoad);
             AssetToggleOff = Assets.Request<Texture2D>("Assets/ToggleOff", AssetRequestMode.ImmediateLoad);
@@ -45,6 +67,9 @@ namespace ModManager
             On_UserInterface.SetState += On_UserInterface_SetState;
 
             Interface.modsMenu = new UIModsNew();
+            Interface.modBrowser.Append(new UIMMBottomPanel());
+            Interface.modPacksMenu.Append(new UIMMBottomPanel());
+            Interface.modSources.Append(new UIMMBottomPanel());
         }
         /*
         public override void PostSetupContent()

@@ -56,6 +56,11 @@ Configs: {
 			// Label: Mod Names
 			// Tooltip: ""
 		}
+
+		ConfigCollections: {
+			// Label: Config Collections
+			// Tooltip: ""
+		}
 	}
 }
 
@@ -75,6 +80,7 @@ CreateFolder: Создать Папку
 Enable: Включить
 Disable: Выключить
 CreateCollection: Создать Коллекцию
+CreateConfigCollection: Создать Конфиг-Коллекцию
 NoActions: Нет доступных действий
 ClickToReturn: Нажмите для Возврата
 ButtonConfig: Конфигурация

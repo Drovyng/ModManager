@@ -58,6 +58,10 @@ namespace ModManager.Content
         public UIContentList collecListIn;
         public UIScrollbar collecScrollbar;
 
+        public UIList configCollecList;
+        public UIContentList configCollecListIn;
+        public UIScrollbar configCollecScrollbar;
+
         public UIPanel categoriesHorizontalOut;
         public UIContentList categoriesHorizontal;
 
@@ -78,6 +82,8 @@ namespace ModManager.Content
         public int ModsChangedDisable;
         public int ModsChangedConfig;
 
+        public string Tooltip;
+
         public static readonly IReadOnlyList<string> Categories = new List<string>()
         {
             "Name", "Author", "Version", "Flags"
@@ -91,8 +97,7 @@ namespace ModManager.Content
             if (_cts == null) return;
             if (ReloadTask != null && !_cts.IsCancellationRequested)
             {
-                _cts?.Cancel(throwOnFirstException: false);
-                _cts?.Dispose();
+                OnDeactivate();
                 waitForReload = true;
                 return;
             }
@@ -186,6 +191,8 @@ namespace ModManager.Content
             buttonOMF = new(LocalizedText.Empty); // Prevents chashing on "Draw()" method
 
             Elements.Clear();
+
+            Append(new UIMMBottomPanel());
 
             root = new UIPanelSizeable()
             {
@@ -304,13 +311,20 @@ namespace ModManager.Content
             collecScrollbar = new UIScrollbar()
             {
                 HAlign = 1,
-                Height = { Precent = 1, Pixels = -16 },
-                MarginTop = MarginBottom = 8,
-                MarginRight = 12
+                Height = { Precent = 0.5f, Pixels = -16 },
+                MarginTop = MarginBottom = 0,
+                MarginRight = 12,
+                Top = { Pixels = 8 }
             }.WithView(100, 1000);
+            var elem231 = new UIPanel()
+            {
+                Width = { Precent = 1, Pixels = -30 },
+                Height = { Precent = 0.5f }
+            };
+            elem231.SetPadding(0);
             collecList = new()
             {
-                Width = { Precent = 1, Pixels = -28 },
+                Width = { Precent = 1 },
                 Height = { Precent = 1 },
                 OverflowHidden = true
             };
@@ -322,9 +336,44 @@ namespace ModManager.Content
             };
             collecList.Append(collecListIn);
             collections.Append(collecScrollbar);
-            collections.Append(collecList);
+            elem231.Append(collecList);
+            collections.Append(elem231);
             collecList.OnScrollWheel += (e, l) => { collecScrollbar.ViewPosition -= e.ScrollWheelValue; };
             collecListIn.OnUpdate += (e) => { collecListIn.Top.Pixels = -collecScrollbar.ViewPosition; };
+
+            configCollecScrollbar = new UIScrollbar()
+            {
+                VAlign = 1,
+                HAlign = 1,
+                Height = { Precent = 0.5f, Pixels = -16 },
+                MarginTop = MarginBottom = 0,
+                MarginRight = 12,
+                Top = { Pixels = -8 }
+            }.WithView(100, 1000);
+            var elem232 = new UIPanel()
+            {
+                Width = { Precent = 1, Pixels = -30 },
+                Height = { Precent = 0.5f }, VAlign = 1
+            };
+            elem232.SetPadding(0);
+            configCollecList = new()
+            {
+                Width = { Precent = 1f },
+                Height = { Precent = 1f },
+                OverflowHidden = true
+            };
+            configCollecListIn = new()
+            {
+                Width = { Precent = 1 },
+                Height = { Precent = 1 },
+                IsVertical = true
+            };
+            configCollecList.Append(configCollecListIn);
+            collections.Append(configCollecScrollbar);
+            elem232.Append(configCollecList);
+            collections.Append(elem232);
+            configCollecList.OnScrollWheel += (e, l) => { collecScrollbar.ViewPosition -= e.ScrollWheelValue; };
+            configCollecListIn.OnUpdate += (e) => { collecListIn.Top.Pixels = -collecScrollbar.ViewPosition; };
 
 
             categoriesHorizontalOut = new()
@@ -556,10 +605,7 @@ namespace ModManager.Content
                     align = 0.5f
                 });
                 buttonConfig.OnLeftClick += (e, l) => {
-                    _cts?.Cancel(throwOnFirstException: false);
-                    _cts?.Dispose();
-                    _cts = null;
-                    _cts = new();
+                    OnDeactivate();
                     Main.menuMode = Interface.modConfigListID;
                     Interface.modConfig.modderOnClose = () =>
                     {
@@ -674,11 +720,17 @@ namespace ModManager.Content
             AddCategories();
             RecalculatePath();
             AddCollections();
+            AddConfigCollections();
         }
         public Action ChangeSelection;
         public void DrawGrabbedMod()
         {
             if (GrabbedItem != null) GrabbedItem.Draw(Main.spriteBatch);
+            if (Tooltip != null)
+            {
+                UICommon.TooltipMouseText(Tooltip);
+                Tooltip = null;
+            }
         }
         private static double StringCompare(string a, string b)
         {
@@ -698,7 +750,7 @@ namespace ModManager.Content
         }
         public bool IsModFiltered(UIModItemNew item)
         {
-            var s = searchField._currentString;
+            var s = searchField._currentString.ToLower();
             if (s.Length == 0 || item.mod == null) return true;
             var n1 = item.Name.ToLower();
             var n2 = item.mod.DisplayNameClean.ToLower();
@@ -879,6 +931,22 @@ namespace ModManager.Content
             }
             CheckChanged();
         }
+        public void AddConfigCollections()
+        {
+            configCollecListIn.Elements.Clear();
+
+            configCollecListIn.Append(new UIModsConfigCollection("Your Config") { isAll = true });
+            (configCollecListIn.Elements[0] as UIModsConfigCollection).Panel.WithFadedMouseOver();
+            (configCollecListIn.Elements[0] as UIModsConfigCollection).Text.align = 0.5f;
+
+            foreach (var item in DataConfig.Instance.ConfigCollections)
+            {
+                configCollecListIn.Append(new UIModsConfigCollection(item));
+            }
+            configCollecListIn.Activate();
+            configCollecList.Recalculate();
+            configCollecScrollbar.SetView(configCollecList.GetInnerDimensions().Height, 0);
+        }
         public void AddCollections()
         {
             collecListIn.Elements.Clear();
@@ -969,7 +1037,6 @@ namespace ModManager.Content
                 LoadingImage.Color = Color.Transparent;
                 if (waitForReload)
                 {
-                    _cts = new CancellationTokenSource();
                     ReloadModsTask();
                     waitForReload = false;
                 }
@@ -1017,6 +1084,9 @@ namespace ModManager.Content
         }
         public override void OnActivate()
         {
+            SelectedItem = null;
+            GrabbedItem = null;
+
             _cts = new CancellationTokenSource();
 
             ReloadModsTask();
@@ -1025,11 +1095,15 @@ namespace ModManager.Content
         }
         public override void OnDeactivate()
         {
-            _cts?.Cancel(throwOnFirstException: false);
-            _cts?.Dispose();
-            _cts = null;
+            var c = _cts;
+            _cts = new CancellationTokenSource();
+            c?.Cancel(throwOnFirstException: false);
+            c?.Dispose();
+
+            SelectedItem = null;
+            GrabbedItem = null;
         }
-        public bool DoNotClose => Main.menuMode != Interface.loadModsID && Main.menuMode != Interface.reloadModsID && (ModsChangedConfig != 0 || ModsChangedDisable != 0 || ModsChangedEnable != 0);
+        public bool DoNotClose => ModsChangedConfig != 0 || ModsChangedDisable != 0 || ModsChangedEnable != 0;
         public float CantLeaveTimer = -1;
         public void DoNotCloseCallback()
         {
@@ -1038,155 +1112,4 @@ namespace ModManager.Content
             CantLeave.Recalculate();
         }
     }
-    public class UIModsCollection : UIElement
-    {
-        public UITextDots<string> Text;
-        public UIPanel Panel;
-        public UIImage Toggle;
-        public bool isAll;
-        public bool toggleEnable;
-        public UIModsCollection(string name)
-        {
-            Text = new()
-            {
-                Width = { Precent = 1 },
-                Height = { Precent = 1 },
-                Top = { Pixels = 8 },
-                text = name,
-            };
-            Panel = new()
-            {
-                Height = { Precent = 1 },
-                PaddingTop = PaddingBottom = 0,
-                PaddingLeft = PaddingRight = 6,
-            };
-        }
-        public override void OnInitialize()
-        {
-            SetPadding(0);
-            if (isAll)
-            {
-                Panel.Width.Set(-6, 1);
-                Panel.Left.Set(2, 0);
-            }
-            else
-            {
-                Panel.Width.Set(-27, 1);
-                Panel.Left.Set(24, 0);
-            }
-            Width.Set(0, 1);
-            Height.Set(32, 0);
-
-            Append(Panel);
-            Panel.Append(Text);
-
-            if (!isAll)
-            {
-                int toggled = 0;
-                int c = 0;
-                var l = DataConfig.Instance.Collections[Text.text];
-                if (l.Count != 0)
-                {
-                    foreach (var item in UIModsNew.Instance.uIMods)
-                    {
-                        if (item.mod != null && l.Contains(item.mod.Name) && item.mod.Enabled) c++;
-                    }
-                    if (c == l.Count) toggled = 1;
-                    else if (c != 0) toggled = 2;
-                }
-                toggleEnable = toggled == 0;
-
-                Toggle = new UIImage(toggled == 0 ? ModManager.AssetToggleOff : (toggled == 1 ? ModManager.AssetToggleOn : ModManager.AssetToggleHalf))
-                {
-                    VAlign = 0.5f,
-                    Color = toggled == 0 ? Color.White : (toggled == 1 ? new Color(0.75f, 1f, 0.75f) : new Color(1f, 0.9f, 0.75f)),
-                    NormalizedOrigin = Vector2.One * 0.5f,
-                    Left = { Pixels = 2 }
-                };
-                Append(Toggle);
-            }
-        }
-        public override void Update(GameTime gameTime)
-        {
-            if (Toggle != null && Toggle.IsMouseHovering)
-            {
-                UIModsNew.Instance.root.UseLeft = false;
-            }
-            if (UIModsNew.Instance.GrabbedItem != null && !isAll)
-            {
-                Panel.BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
-                Panel.BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;
-                if (IsMouseHovering)
-                {
-                    UIModsNew.Instance.GrabbedFolder = "collections/" + Text.text;
-                }
-                return;
-            }
-            Panel.BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) * 0.75f : new Color(63, 82, 151) * 0.25f;
-            Panel.BorderColor = UIModsNew.Instance.SelectedCollection == this ? Color.Gold : Color.Black;
-        }
-        public override void LeftClick(UIMouseEvent evt)
-        {
-            if (Toggle != null && Toggle.IsMouseHovering)
-            {
-                var l = DataConfig.Instance.Collections[Text.text];
-                if (l.Count != 0)
-                {
-                    foreach (var item in UIModsNew.Instance.uIMods)
-                    {
-                        if (item.mod != null && l.Contains(item.mod.Name))
-                        {
-                            item.Set(toggleEnable);
-                        }
-                    }
-                }
-                return;
-            }
-            UIModsNew.Instance.OpenedCollections = true;
-            UIModsNew.Instance.OpenedPath.Clear();
-            if (!isAll) UIModsNew.Instance.OpenedPath.Add(Text.text);
-            UIModsNew.Instance.RecalculatePath();
-        }
-    }
-    public class UIModsPathPart : UIPanel
-    {
-        public UITextDots<string> Text;
-        public string path;
-        public UIModsPathPart(string text, string _path)
-        {
-            path = _path;
-            var size = FontAssets.MouseText.Value.MeasureString(text + ".").X + 10;
-            Text = new()
-            {
-                Width = { Precent = 1 },
-                Height = { Precent = 1 },
-                text = text,
-                Left = { Pixels = 6 },
-                Top = { Pixels = 4 }
-            };
-            Width = new(size, 0);
-        }
-        public override void OnInitialize()
-        {
-            Append(Text);
-            Height.Set(0, 1);
-            SetPadding(0);
-        }
-        public override void Update(GameTime gameTime)
-        {
-            if (UIModsNew.Instance.GrabbedItem != null)
-            {
-                BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
-                BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;
-                if (IsMouseHovering)
-                {
-                    UIModsNew.Instance.GrabbedFolder = path;
-                }
-                return;
-            }
-            BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) * 0.75f : new Color(63, 82, 151) * 0.25f;
-            BorderColor = IsMouseHovering ? Color.Gold : Color.Black;
-        }
-    }
-    
 }

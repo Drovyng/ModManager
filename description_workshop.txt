@@ -3,18 +3,28 @@ This mod is intended to improve the experience of interacting with the tModLoade
 [b][u]Currently the mod is IN ALPHA VERSION and may contain bugs and contain raw content.[/u][/b]
 
 [hr]
+[h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   NOT SUPPORTED MODS[/h1]
+[olist]
+[*] [b]Concise Mod List[/b] [i](but implements its functionality)[/i]
+[*] [b]Smart Mod Management (For TML)[/b] [i](but implements its functionality)[/i]
+[*] [b]Show Mod Side Icon[/b] [i](but implements its functionality)[/i]
+[/olist]
+
+[hr]
 [h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   MODS LIST UPGRADE[/h1]
-[h2]Showcase: Scaling[/h2][video mp4=https://i.imgur.com/hTeidMr.mp4][/video]
-[h2]Showcase: Filters[/h2][video mp4=https://i.imgur.com/GX7KrGl.mp4][/video]
-[h2]Showcase: Renaming[/h2][video mp4=https://i.imgur.com/dXlHFQk.mp4][/video]
-[h2]Showcase: Folders And Paths[/h2][video mp4=https://i.imgur.com/STv1yK6.mp4][/video]
-[h2]Showcase: Collections[/h2][video mp4=https://i.imgur.com/LCCzs4n.mp4][/video]
+[h2]Showcase: Scaling[/h2][video mp4=https://i.imgur.com/2fXljrE.mp4][/video]
+[h2]Showcase: Filters[/h2][video mp4=https://i.imgur.com/wRWQeyi.mp4][/video]
+[h2]Showcase: Renaming[/h2][video mp4=https://i.imgur.com/CUOoOF2.mp4][/video]
+[h2]Showcase: Folders And Paths[/h2][video mp4=https://i.imgur.com/916p6n8.mp4][/video]
+[h2]Showcase: Collections[/h2][video mp4=https://i.imgur.com/TlQ6exq.mp4][/video]
+[h2]Showcase: Customization[/h2][video mp4=https://i.imgur.com/OBISdwR.mp4][/video]
 
 [hr]
 [h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀PLANS[/h1]
 [olist]
 [*] Fully Complete [b]MODS LIST UPGRADE[/b]
 [*] Rework [b]MODS BROWSER[/b]
+[*] Rework [b]EVERY WORKSHOP MENU [i](almost)[/i][/b]
 [*] Add Other Mods Compatibility
 [*] etc...
 [/olist]

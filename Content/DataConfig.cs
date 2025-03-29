@@ -17,6 +17,7 @@ namespace ModManager.Content
         public int[] CategoriesSizes = [90, -96, -12, -118];
 
         public List<string> Folders = new List<string>();
+        public List<string> ConfigCollections = new List<string>();
         public Dictionary<string, string> ModPaths = new Dictionary<string, string>();
         public Dictionary<string, string> ModNames = new Dictionary<string, string>();
         public Dictionary<string, List<string>> Collections = new Dictionary<string, List<string>>();

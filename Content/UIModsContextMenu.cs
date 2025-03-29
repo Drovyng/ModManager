@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
+using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
@@ -25,7 +26,7 @@ namespace ModManager.Content
             PaddingBottom = PaddingTop = PaddingLeft = PaddingRight = 0;
             Elements.Clear();
             Actions.Clear();
-            Width.Set(200, 0);
+            Width.Set(150, 0);
             Left.Set(Main.mouseX - 4, 0);
             Top.Set(Main.mouseY - 4, 0);
             UseRight = true;
@@ -34,12 +35,18 @@ namespace ModManager.Content
             
             UIModItemNew uIMod = null;
             UIModsCollection coll = null;
+            UIModsConfigCollection colld = null;
 
             if (Target is UIModItemNew uIMod1) uIMod = uIMod1;
             if (Target.Parent is UIModItemNew uIMod2) { uIMod = uIMod2; Target = Target.Parent; }
+
             if (Target is UIModsCollection coll1) coll = coll1;
             if (Target.Parent is UIModsCollection coll2) coll = coll2;
             if (Target.Parent.Parent is UIModsCollection coll3) coll = coll3;
+
+            if (Target is UIModsConfigCollection colld1) colld = colld1;
+            if (Target.Parent is UIModsConfigCollection colld2) colld = colld2;
+            if (Target.Parent.Parent is UIModsConfigCollection colld3) colld = colld3;
 
             if (uIMod != null)
             {
@@ -56,20 +63,31 @@ namespace ModManager.Content
                 AddAction("Rename");
                 AddAction(UIModsNew.Instance.OpenedCollections ? "Remove" : "Delete");
             }
-            else if (coll != null)
+            else if (coll != null && !coll.isAll)
             {
                 AddAction("CreateCollection");
                 AddAction("RenameCollection");
                 AddAction("DeleteCollection");
                 UIModsNew.Instance.SelectedCollection = coll;
             }
-            else if (Target == UIModsNew.Instance.mainListIn)
+            else if (colld != null && !colld.isAll)
             {
-                if (!UIModsNew.Instance.OpenedCollections) AddAction("CreateFolder");
+                Target = colld;
+                AddAction("CreateConfigCollection");
+                AddAction("RenameConfigCollection");
+                AddAction("DeleteConfigCollection");
+            }
+            else if (Target == UIModsNew.Instance.mainListIn && !!UIModsNew.Instance.OpenedCollections)
+            {
+                AddAction("CreateFolder");
             }
             else if (Target == UIModsNew.Instance.collecListIn)
             {
                 AddAction("CreateCollection");
+            }
+            else if (Target == UIModsNew.Instance.configCollecListIn)
+            {
+                AddAction("CreateConfigCollection");
             }
             else
             {
@@ -114,6 +132,40 @@ namespace ModManager.Content
                         }
                         i1++;
                     }
+                case "CreateConfigCollection":
+                    var cfg2 = DataConfig.Instance;
+                    int i2 = 0;
+                    while (true)
+                    {
+                        var name = "New Config Collection" + (i2 == 0 ? "" : " (" + i2 + ")");
+                        if (!cfg2.ConfigCollections.Contains(name))
+                        {
+                            UIModsConfigCollection.SaveAll(name);
+                            cfg2.ConfigCollections.Add(name);
+                            cfg2.Save();
+                            UIModsNew.Instance.AddConfigCollections();
+                            return;
+                        }
+                        i2++;
+                    }
+                case "RenameConfigCollection":
+                    var t = Target as UIModsConfigCollection;
+                    UIModsNew.Instance.popupRename.Popup(t.Text.text, t.Text.text, (value) =>
+                    {
+                        UIModsConfigCollection.Rename(t.Text.text, value);
+                        var cfg = DataConfig.Instance;
+                        cfg.ConfigCollections.Remove(t.Text.text);
+                        cfg.ConfigCollections.Add(value);
+                        cfg.Save();
+                        UIModsNew.Instance.AddConfigCollections();
+                    });
+                    return;
+                case "DeleteConfigCollection":
+                    UIModsConfigCollection.Delete((Target as UIModsConfigCollection).Text.text);
+                    DataConfig.Instance.ConfigCollections.Remove((Target as UIModsConfigCollection).Text.text);
+                    DataConfig.Instance.Save();
+                    UIModsNew.Instance.AddConfigCollections();
+                    return;
                 case "Info":
                     UIModsNew.Instance.ShowInfo();
                     return;
@@ -145,6 +197,7 @@ namespace ModManager.Content
                     return;
                 case "DeleteCollection":
                     if (UIModsNew.Instance.SelectedCollection == null) return;
+                    DataConfig.Instance.Collections.Remove(UIModsNew.Instance.SelectedCollection.Text.text);
                     if (UIModsNew.Instance.OpenedCollections && UIModsNew.Instance.OpenedPath.Count != 0 && UIModsNew.Instance.OpenedPath[0] == UIModsNew.Instance.SelectedCollection.Text.text)
                     {
                         UIModsNew.Instance.OpenedPath.Clear();
@@ -152,7 +205,6 @@ namespace ModManager.Content
                         UIModsNew.Instance.SelectedCollection = null;
                         UIModsNew.Instance.RecalculatePath();
                     }
-                    DataConfig.Instance.Collections.Remove(UIModsNew.Instance.SelectedCollection.Text.text);
                     DataConfig.Instance.Save();
                     UIModsNew.Instance.AddCollections();
                     return;
@@ -190,7 +242,7 @@ namespace ModManager.Content
             var act = new UIModsContextMenuAction();
             act.IgnoresMouseInteraction = act.inactive = inactive;
             act.Name = Name;
-            act.Text = Name.Replace("DeleteCollection", "Delete").Replace("RenameCollection", "Rename");
+            act.Text = Name.Replace("DeleteCollection", "Delete").Replace("RenameCollection", "Rename").Replace("DeleteConfigCollection", "Delete").Replace("RenameConfigCollection", "Rename");
             act.Top.Pixels = posY;
             var n = Name;
             act.OnLeftClick += (e, l) =>
@@ -201,6 +253,7 @@ namespace ModManager.Content
                 Recalculate();
             };
             Height.Pixels += 32;
+            Width.Pixels = Math.Max(Width.Pixels, 24 + FontAssets.MouseText.Value.MeasureString(Language.GetTextValue("Mods.ModManager." + act.Text)).X);
             posY += 32;
             Actions.Add(act);
             Append(act);
