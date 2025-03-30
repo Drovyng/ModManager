@@ -8,10 +8,8 @@ using Terraria.ModLoader.Config;
 using Terraria.UI;
 using System.Linq;
 using System.Collections.Generic;
-using tModPorter;
 using Terraria.ModLoader.UI;
 using Terraria;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ModManager.Content.ModsList
 {

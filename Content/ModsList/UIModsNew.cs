@@ -69,14 +69,17 @@ namespace ModManager.Content.ModsList
 
         public List<UIModItemNew> uIMods = new();
 
-        public UIModItemNew SelectedItem = null;
+        public List<UIModItemNew> SelectedItems = new();
+        public UIModItemNew SelectedItem => SelectedItems.Count == 1 ? SelectedItems[0] : null;
+        public bool GrabbedItem = false;
         public UIModsCollection SelectedCollection = null;
-        public UIModItemNew GrabbedItem = null;
         public string GrabbedFolder = null;
 
         public UIImage LoadingImage;
 
         public UIPanel CantLeave;
+
+        public UIPanel BottomCounter;
 
         public int ModsChangedEnable;
         public int ModsChangedDisable;
@@ -86,7 +89,7 @@ namespace ModManager.Content.ModsList
 
         public static readonly IReadOnlyList<string> Categories = new List<string>()
         {
-            "Name", "Author", "Version", "Flags"
+            "", "Name", "Author", "Version", "Flags"
         }; public static readonly IReadOnlyList<string> Filters = new List<string> { "▼", "▲", "⎯" };
 
         public int FilterCategory = 1;
@@ -192,7 +195,7 @@ namespace ModManager.Content.ModsList
 
             Elements.Clear();
 
-            Append(new UIMMBottomPanel());
+            Append(new UIMMTopPanel());
 
             root = new UIPanelSizeable()
             {
@@ -428,7 +431,7 @@ namespace ModManager.Content.ModsList
                 var elem = new UIElement()
                 {
                     Width = { Precent = 1 },
-                    Height = { Precent = 1, Pixels = -96 },
+                    Height = { Precent = 1, Pixels = -128 },
                 };
                 LoadingImage = new UIImage(ModManager.AssetLoading)
                 {
@@ -441,6 +444,55 @@ namespace ModManager.Content.ModsList
                 elem.Append(mainList);
                 elem.Append(LoadingImage);
                 mainVertical.Append(elem);
+            }
+            BottomCounter = new UIPanel()
+            {
+                Width = { Precent = 1 },
+                Height = { Pixels = 32 }
+            };
+            BottomCounter.SetPadding(0);
+            BottomCounter.PaddingLeft = BottomCounter.PaddingRight = 24;
+            mainVertical.Append(BottomCounter);
+            {
+                var numElements = new UITextDots<string>()
+                {
+                    Width = { Percent = 1f / 3f },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 }
+                };
+                BottomCounter.Append(numElements);
+                var numSelected = new UITextDots<string>()
+                {
+                    Width = { Percent = 1f / 3f },
+                    Left = { Percent = 1f / 3f },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 }
+                };
+                BottomCounter.Append(numSelected);
+                var numEnabled = new UITextDots<string>()
+                {
+                    Width = { Percent = 1f / 3f },
+                    Left = { Percent = 2f / 3f },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 }
+                };
+                BottomCounter.Append(numEnabled);
+                void Recalc()
+                {
+                    var total = 0;
+                    var enabl = 0;
+                    foreach (var item in uIMods)
+                    {
+                        if (item.Active) total++;
+                        if (item.mod != null && item.mod.Enabled) enabl++;
+                    }
+                    numElements.text = ModManager.Get("NumberElements").ToString() + ": " + total;
+                    numSelected.text = ModManager.Get("NumberSelected").ToString() + ": " + SelectedItems.Count;
+                    numEnabled.text = ModManager.Get("NumberEnabled").ToString() + ": " + enabl;
+                }
+                Recalc();
+                ChangeSelection += Recalc;
+                CheckChangedCallback += Recalc;
             }
             {
                 var ontopSettings = new UIPanel()
@@ -595,12 +647,12 @@ namespace ModManager.Content.ModsList
                     Left = { Precent = 0.3f },
                     Width = { Precent = 0.4f },
                     Height = { Precent = 1 },
-                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8,
                 };
+                ontopButtons.SetPadding(0);
                 var buttonConfig = new UIPanel()
                 {
                     Width = { Precent = 0.4f },
-                    Height = { Precent = 0.5f },
+                    Height = { Precent = 1f / 3f },
                 }.WithFadedMouseOver();
                 buttonConfig.Append(new UITextDots<LocalizedText>()
                 {
@@ -624,7 +676,7 @@ namespace ModManager.Content.ModsList
                 var buttonApply = new UIPanel()
                 {
                     Width = { Precent = 0.6f },
-                    Height = { Precent = 0.5f },
+                    Height = { Precent = 1f / 3f },
                     Left = { Precent = 0.4f }
                 }.WithFadedMouseOver();
                 buttonApply.Append(new UITextDots<LocalizedText>()
@@ -645,13 +697,20 @@ namespace ModManager.Content.ModsList
                     };
                     ModLoader.Reload();
                 };
+                buttonApply.OnUpdate += delegate
+                {
+                    if (buttonApply.IsMouseHovering) Tooltip = ModManager.Get("ButtonApplyChanges").ToString() + ":\n" +
+                    ModManager.Get("ChangedEnabled").ToString() + ": " + ModsChangedEnable + "\n" +
+                    ModManager.Get("ChangedDisabled").ToString() + ": " + ModsChangedDisable + "\n" +
+                    ModManager.Get("ChangedConfigs").ToString() + ": " + ModsChangedConfig;
+                };
                 ontopButtons.Append(buttonApply);
                 var buttonReject = new UIPanel()
                 {
                     Width = { Precent = 0.6f },
-                    Height = { Precent = 0.5f },
+                    Height = { Precent = 1f / 3f },
                     Left = { Precent = 0.4f },
-                    Top = { Precent = 0.5f }
+                    Top = { Precent = 1f / 3f }
                 }.WithFadedMouseOver();
                 buttonReject.Append(new UITextDots<LocalizedText>()
                 {
@@ -661,16 +720,20 @@ namespace ModManager.Content.ModsList
                     Top = { Pixels = 4 },
                     align = 0.5f
                 });
-                buttonReject.OnLeftClick += (e, l) =>
+                buttonReject.OnLeftClick += (_, _) => RejectChanges();
+                buttonReject.OnUpdate += delegate
                 {
-                    RejectChanges();
+                    if (buttonReject.IsMouseHovering) Tooltip = ModManager.Get("ButtonRejectChanges").ToString() + ":\n" +
+                    ModManager.Get("ChangedEnabled").ToString() + ": " + ModsChangedEnable + "\n" +
+                    ModManager.Get("ChangedDisabled").ToString() + ": " + ModsChangedDisable + "\n" +
+                    ModManager.Get("ChangedConfigs").ToString() + ": " + ModsChangedConfig;
                 };
                 ontopButtons.Append(buttonReject);
                 var buttonInfo = new UIPanel()
                 {
                     Width = { Precent = 0.4f },
-                    Height = { Precent = 0.5f },
-                    Top = { Precent = 0.5f }
+                    Height = { Precent = 1f / 3f },
+                    Top = { Precent = 1f / 3f }
                 }.WithFadedMouseOver();
                 buttonInfo.Append(new UITextDots<LocalizedText>()
                 {
@@ -689,9 +752,56 @@ namespace ModManager.Content.ModsList
                     buttonInfo.BackgroundColor = buttonInfo.IgnoresMouseInteraction ? new Color(137, 102, 201) * 0.7f : UICommon.DefaultUIBlueMouseOver;
                 };
                 ontopButtons.Append(buttonInfo);
+
+                var buttonEnableAll = new UIPanel()
+                {
+                    Width = { Precent = 0.5f },
+                    Height = { Precent = 1f / 3f },
+                    Top = { Precent = 2f / 3f }
+                }.WithFadedMouseOver();
+                buttonEnableAll.Append(new UITextDots<LocalizedText>()
+                {
+                    text = Language.GetText("tModLoader.ModsEnableAll"),
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 },
+                    align = 0.5f
+                });
+                buttonEnableAll.OnLeftClick += (e, l) =>
+                {
+                    foreach (var item in uIMods)
+                    {
+                        if (item.mod != null && !ModManager.BadMods.Contains(item.mod.Name)) item.Set(true);
+                    }
+                };
+                ontopButtons.Append(buttonEnableAll);
+                var buttonDisableAll = new UIPanel()
+                {
+                    Width = { Precent = 0.5f },
+                    Left = { Precent = 0.5f },
+                    Height = { Precent = 1f / 3f },
+                    Top = { Precent = 2f / 3f }
+                }.WithFadedMouseOver();
+                buttonDisableAll.Append(new UITextDots<LocalizedText>()
+                {
+                    text = Language.GetText("tModLoader.ModsDisableAll"),
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 },
+                    align = 0.5f
+                });
+                buttonDisableAll.OnLeftClick += (e, l) =>
+                {
+                    foreach (var item in uIMods)
+                    {
+                        item.Set(false);
+                    }
+                };
+                ontopButtons.Append(buttonDisableAll);
+
                 topPanel.Append(ontopButtons);
 
-                CheckChangedCallback = () =>
+                CheckChangedCallback += () =>
                 {
                     var c = !DoNotClose;
                     var col = c ? new Color(137, 102, 201) * 0.7f : UICommon.DefaultUIBlueMouseOver;
@@ -734,7 +844,22 @@ namespace ModManager.Content.ModsList
         public Action ChangeSelection;
         public void DrawGrabbedMod()
         {
-            if (GrabbedItem != null) GrabbedItem.Draw(Main.spriteBatch);
+            if (GrabbedItem)
+            {
+                float p = 0;
+                foreach (var item in SelectedItems)
+                {
+                    item._outerDimensions.X = Main.mouseX;
+                    item._outerDimensions.Y = Main.mouseY + p;
+                    item._innerDimensions.X = Main.mouseX;
+                    item._innerDimensions.Y = Main.mouseY + p;
+                    item._dimensions.X = Main.mouseX;
+                    item._dimensions.Y = Main.mouseY + p;
+                    item.RecalculateChildren();
+                    item.Draw(Main.spriteBatch);
+                    p += item._outerDimensions.Height;
+                }
+            }
             if (Tooltip != null)
             {
                 UICommon.TooltipMouseText(Tooltip);
@@ -824,6 +949,9 @@ namespace ModManager.Content.ModsList
                 OpenedPath.Clear();
                 OpenedCollections = false;
                 RecalculatePath();
+                GrabbedItem = false;
+                SelectedItems.Clear();
+                ChangeSelection();
             };
             var k = 0;
             string path = "/";
@@ -840,6 +968,9 @@ namespace ModManager.Content.ModsList
                     {
                         OpenedPath.Clear();
                         OpenedCollections = false;
+                        GrabbedItem = false;
+                        SelectedItems.Clear();
+                        ChangeSelection();
                     }
                     else while (OpenedPath.Count > j) OpenedPath.RemoveAt(j);
                     RecalculatePath();
@@ -854,6 +985,9 @@ namespace ModManager.Content.ModsList
                     OpenedPath.Clear();
                     OpenedCollections = false;
                     RecalculatePath();
+                    GrabbedItem = false;
+                    SelectedItems.Clear();
+                    ChangeSelection();
                 };
                 p.Text.align = 0.5f;
                 p.Width.Pixels += 100;
@@ -884,9 +1018,9 @@ namespace ModManager.Content.ModsList
 
                     if (pos.X + mod.GetOuterDimensions().Width / c.Width > 1)
                     {
-                        pos.X = 0;
                         pos.Y += mod.GetOuterDimensions().Height;
                         mod.Left.Precent = 0;
+                        pos.X = add;
                     }
                     else
                     {
@@ -914,7 +1048,7 @@ namespace ModManager.Content.ModsList
                 if (mod.mod != null)
                 {
                     if (mod.mod.Enabled && !mod.loaded) ModsChangedEnable++;
-                    else if (!mod.mod.Enabled && mod.loaded) ModsChangedEnable--;
+                    else if (!mod.mod.Enabled && mod.loaded) ModsChangedDisable++;
                     if (ModLoader.TryGetMod(mod.mod.Name, out var result) && ConfigManager.Configs.ContainsKey(result) && ConfigManager.ModNeedsReload(result))
                         ModsChangedConfig++;
                 }
@@ -975,13 +1109,14 @@ namespace ModManager.Content.ModsList
         public void AddCategories()
         {
             categoriesHorizontal.Elements.Clear();
-            var k = 0;
+
+            var k = -1;
             foreach (var item in Categories)
             {
                 k++;
                 var j = k;
                 var i = new UIModsTableCategory(item, j - 1);
-                i.Width.Pixels = DataConfig.Instance.CategoriesSizes[j - 1];
+                if (j > 0 && j < 4) i.Width.Pixels = DataConfig.Instance.CategoriesSizes[j - 1];
                 if (j == FilterCategory) i.Filter.text = Filters[FilterCategoryType];
                 else i.Filter.text = Filters[2];
                 i.OnClick = () =>
@@ -1003,10 +1138,10 @@ namespace ModManager.Content.ModsList
                 i.OnResizing = RedesignUIMods;
                 categoriesHorizontal.Append(i);
             }
-            for (int i = 0; i < Categories.Count; i++)
+            for (int i = 1; i < Categories.Count; i++)
             {
                 var item = categoriesHorizontal.Elements[i] as UIModsTableCategory;
-                for (int j = 0; j < i; j++)
+                for (int j = 1; j < i; j++)
                 {
                     item.LeftElem.Add(categoriesHorizontal.Elements[j]);
                 }
@@ -1081,9 +1216,9 @@ namespace ModManager.Content.ModsList
             cfg.RootSize[0] = (int)root.Width.Pixels;
             cfg.RootSize[1] = (int)root.Height.Pixels;
 
-            for (int i = 0; i < Categories.Count; i++)
+            for (int i = 1; i < Categories.Count; i++)
             {
-                cfg.CategoriesSizes[i] = (int)categoriesHorizontal.Elements[i].Width.Pixels;
+                cfg.CategoriesSizes[i-1] = (int)categoriesHorizontal.Elements[i].Width.Pixels;
             }
             cfg.CollectionsSize = (int)collections.Width.Pixels;
 
@@ -1095,8 +1230,8 @@ namespace ModManager.Content.ModsList
         }
         public override void OnActivate()
         {
-            SelectedItem = null;
-            GrabbedItem = null;
+            SelectedItems.Clear();
+            GrabbedItem = false;
 
             _cts = new CancellationTokenSource();
 
@@ -1111,8 +1246,8 @@ namespace ModManager.Content.ModsList
             c?.Cancel(throwOnFirstException: false);
             c?.Dispose();
 
-            SelectedItem = null;
-            GrabbedItem = null;
+            SelectedItems.Clear();
+            GrabbedItem = false;
         }
         public bool DoNotClose => ModsChangedConfig != 0 || ModsChangedDisable != 0 || ModsChangedEnable != 0;
         public float CantLeaveTimer = -1;

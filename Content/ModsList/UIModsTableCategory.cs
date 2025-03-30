@@ -32,7 +32,12 @@ namespace ModManager.Content.ModsList
                 align = 1f,
                 scale = 1f,
             };
-            Width = new(0, i == 3 ? 0 : 1f / (UIModsNew.Categories.Count - 1));
+            if (i == -1)
+            {
+                Filter.align = 0.5f;
+                Filter.Width.Pixels = 0;
+            }
+            Width = new(0, i == 3 ? 0 : 1f / (UIModsNew.Categories.Count - 2));
         }
         public override void OnInitialize()
         {
@@ -40,13 +45,13 @@ namespace ModManager.Content.ModsList
             Append(Filter);
             Height.Set(0, 1);
             SetPadding(0);
-            UseLeft = id != 0 && id != 3;
-            UseRight = id < 2;
+            UseLeft = id > 0 && id != 3;
+            UseRight = id != -1 && id < 2;
         }
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            var lol = UIModsNew.Instance.GrabbedItem != null;
+            var lol = UIModsNew.Instance.GrabbedItem;
             BackgroundColor = IsMouseHovering && !lol ? new Color(63, 82, 151) * 0.75f : new Color(63, 82, 151) * 0.25f;
             BorderColor = IsMouseHovering && !lol ? Color.Gold : Color.Black;
             if (lol)
@@ -63,6 +68,12 @@ namespace ModManager.Content.ModsList
             var w = GetOuterDimensions().Width;
             var add = 75 - w;
             var flag = add > 0;
+            if (id == -1)
+            {
+                Width.Pixels += 32 - w;
+                add = (UIModsNew.Instance.categoriesHorizontal.TotalSize - UIModsNew.Instance.categoriesHorizontal.GetInnerDimensions().Width) / 3;
+                flag = true;
+            }
             if (id == 3)
             {
                 Width.Pixels += 118 - w;
@@ -75,16 +86,17 @@ namespace ModManager.Content.ModsList
                 {
                     if (item.GetOuterDimensions().Width >= 75 + add || add < 0)
                     {
-                        item.Width.Pixels -= add; if (id != 3) Width.Pixels += add; item.Recalculate(); Recalculate(); return;
+                        item.Width.Pixels -= add; if (id != 3 && id != -1) Width.Pixels += add; item.Recalculate(); Recalculate(); return;
                     }
                 }
                 foreach (var item in RightElem)
                 {
-                    if (item.GetOuterDimensions().Width >= 75 + add)
+                    if (item.GetOuterDimensions().Width >= 75 + add || add < 0)
                     {
-                        item.Width.Pixels -= add; if (id != 3) Width.Pixels += add; item.Recalculate(); Recalculate(); return;
+                        item.Width.Pixels -= add; if (id != 3 && id != -1) Width.Pixels += add; item.Recalculate(); Recalculate(); return;
                     }
                 }
+                UIModsNew.Instance.RedesignUIMods();
             }
         }
         public override void LeftMouseDown(UIMouseEvent evt)

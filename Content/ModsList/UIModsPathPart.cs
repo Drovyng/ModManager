@@ -30,7 +30,7 @@ namespace ModManager.Content.ModsList
         }
         public override void Update(GameTime gameTime)
         {
-            if (UIModsNew.Instance.GrabbedItem != null)
+            if (UIModsNew.Instance.GrabbedItem)
             {
                 BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
                 BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;

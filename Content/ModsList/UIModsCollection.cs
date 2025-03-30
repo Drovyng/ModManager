@@ -78,7 +78,7 @@ namespace ModManager.Content.ModsList
             {
                 UIModsNew.Instance.root.UseLeft = false;
             }
-            if (UIModsNew.Instance.GrabbedItem != null && !isAll)
+            if (UIModsNew.Instance.GrabbedItem && !isAll)
             {
                 Panel.BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
                 Panel.BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;
@@ -86,7 +86,6 @@ namespace ModManager.Content.ModsList
                 {
                     UIModsNew.Instance.GrabbedFolder = "collections/" + Text.text;
                 }
-                //Terraria.Social.Steam.WorkshopHelper.MetadataKeys
                 return;
             }
             Panel.BackgroundColor = IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f;
@@ -113,6 +112,9 @@ namespace ModManager.Content.ModsList
             UIModsNew.Instance.OpenedPath.Clear();
             if (!isAll) UIModsNew.Instance.OpenedPath.Add(Text.text);
             UIModsNew.Instance.RecalculatePath();
+            UIModsNew.Instance.SelectedItems.Clear();
+            UIModsNew.Instance.GrabbedItem = false;
+            UIModsNew.Instance.ChangeSelection();
         }
     }
 

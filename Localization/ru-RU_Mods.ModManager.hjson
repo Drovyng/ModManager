@@ -117,3 +117,9 @@ ButtonApplyChanges: Применить Изменения
 ButtonRejectChanges: Отклонить Изменения
 ButtonInfo: Информация
 SearchModsHint: Введите для поиска модов
+NumberElements: Элементов
+NumberSelected: Выделено
+NumberEnabled: Включено
+ChangedEnabled: Включённые
+ChangedDisabled: Выключенные
+ChangedConfigs: Конфиги

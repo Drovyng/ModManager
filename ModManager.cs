@@ -17,6 +17,12 @@ using Terraria.UI;
 
 namespace ModManager
 {
+    public class UnsupportedModsException : Exception
+    {
+        public override string StackTrace => "";
+        public override string ToString() => base.Message;
+        public UnsupportedModsException(string text) : base(text) { }
+    }
     public class ModManager : Mod
 	{
         public static ModManager Instance;
@@ -43,13 +49,12 @@ namespace ModManager
             bool flag = false;
             foreach (var item in ModLoader.Mods)
             {
-                if (BadMods.Contains(item.Name)) { badmods.Add(item.DisplayNameClean); flag = true; }
+                if (BadMods.Contains(item.Name)) { badmods.Add("[c/FFFF88:" + item.DisplayNameClean + "]"); flag = true; }
             }
             if (flag)
             {
-                throw new Exception("ModManager does not support this mods: [" + string.Join(",", badmods) + "]");
+                throw new UnsupportedModsException("[c/FF8888:ModManager does not support this mods:]\n\n" + string.Join(",\n", badmods) + "\n\n[c/88FF88:Please turn them off!]");
             }
-
             Instance = this;
 
             AssetIconServer = Assets.Request<Texture2D>("Assets/ServerIcon", AssetRequestMode.ImmediateLoad);
@@ -68,18 +73,14 @@ namespace ModManager
             On_Main.DoDraw += On_Main_DoDraw;
 
             Interface.modsMenu = new UIModsNew();
-            Interface.modBrowser.Append(new UIMMBottomPanel());
-            Interface.modPacksMenu.Append(new UIMMBottomPanel());
-            Interface.modSources.Append(new UIMMBottomPanel());
-
-            On_WorkshopHelper.QueryHelper.AQueryInstance.OnWorkshopQueryInitialized += AQueryInstance_OnWorkshopQueryInitialized;
+            Interface.modBrowser.Append(new UIMMTopPanel());
+            Interface.modPacksMenu.Append(new UIMMTopPanel());
+            Interface.modSources.Append(new UIMMTopPanel());
         }
-
-        private void AQueryInstance_OnWorkshopQueryInitialized(On_WorkshopHelper.QueryHelper.AQueryInstance.orig_OnWorkshopQueryInitialized orig, object self, Steamworks.SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
+        public static void OpenFolder(string path)
         {
-            (self as WorkshopHelper.QueryHelper.AQueryInstance).numberPages = Math.Min((self as WorkshopHelper.QueryHelper.AQueryInstance).numberPages, 100);
+            if (System.IO.Directory.Exists(path)) Utils.OpenFolder(path);
         }
-
         /*
 public override void PostSetupContent()
 {

@@ -117,3 +117,9 @@ ButtonApplyChanges: Apply Changes
 ButtonRejectChanges: Reject Changes
 ButtonInfo: Mod Info
 SearchModsHint: Type to search mods
+NumberElements: Elements
+NumberSelected: Selected
+NumberEnabled: Enabled
+ChangedEnabled: Enabled
+ChangedDisabled: Disabled
+ChangedConfigs: Configs

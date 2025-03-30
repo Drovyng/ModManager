@@ -119,7 +119,6 @@ namespace ModManager.Content.ModsBrowser
                 }
                 categoriesHorizontal.Recalculate();
             }
-            //base.ModList.
         }
         public void Redesign()
         {

@@ -10,8 +10,9 @@ using Terraria.UI;
 
 namespace ModManager.Content
 {
-    public class UIMMBottomPanel : UIPanel
+    public class UIMMTopPanel : UIPanel
     {
+        public UIPanel buttonBack;
         public UIPanel buttonMods;
         public UIPanel buttonModBrowser;
         public UIPanel buttonModPacks;
@@ -20,6 +21,16 @@ namespace ModManager.Content
         {
             SetPadding(0);
             Height.Set(40, 0);
+
+            buttonBack = new UIPanel().WithFadedMouseOver();
+            buttonBack.Height.Precent = 1;
+            buttonBack.Append(new UIText(Language.GetText("UI.Back"), 0.6f, true)
+            {
+                Width = { Precent = 1 }, Height = { Precent = 1 }, TextOriginX = 0.5f, TextOriginY = 0.5f
+            }); buttonBack.SetPadding(0);
+            buttonBack.OnLeftClick += (_, _) => { Click(null); };
+            buttonBack.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
+            Append(buttonBack);
 
             buttonMods = new UIPanel().WithFadedMouseOver();
             buttonMods.Height.Precent = 1;
@@ -65,12 +76,15 @@ namespace ModManager.Content
         public override void OnActivate()
         {
             var f = FontAssets.DeathText.Value;
+            buttonBack.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("UI.Back")).X * 0.6f;
             buttonMods.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.MenuManageMods")).X * 0.6f;
             buttonModBrowser.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.MenuModBrowser")).X * 0.6f;
             buttonModPacks.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.ModsModPacks")).X * 0.6f;
             buttonModDevelop.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.MenuDevelopMods")).X * 0.6f;
 
-            Width.Pixels = buttonMods.Width.Pixels;
+            Width.Pixels = buttonBack.Width.Pixels;
+            buttonMods.Left.Pixels = Width.Pixels;
+            Width.Pixels = buttonMods.Width.Pixels + buttonBack.Width.Pixels;
 
             buttonModBrowser.Left.Pixels = Width.Pixels;
             Width.Pixels += buttonModBrowser.Width.Pixels;
@@ -92,6 +106,7 @@ namespace ModManager.Content
             buttonModPacks.BorderColor = Main.MenuUI._currentState == Interface.modPacksMenu ? Color.Gold : Color.Black;
             buttonModDevelop.BorderColor = Main.MenuUI._currentState == Interface.modSources ? Color.Gold : Color.Black;
 
+            buttonBack.BackgroundColor = buttonBack.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver;
             buttonMods.BackgroundColor = Main.MenuUI._currentState == Interface.modsMenu ? new Color(93, 102, 171) * 0.7f : (buttonMods.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver);
             buttonModBrowser.BackgroundColor = Main.MenuUI._currentState == Interface.modBrowser ? new Color(93, 102, 171) * 0.7f : (buttonModBrowser.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver);
             buttonModPacks.BackgroundColor = Main.MenuUI._currentState == Interface.modPacksMenu ? new Color(93, 102, 171) * 0.7f : (buttonModPacks.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver);
@@ -104,6 +119,12 @@ namespace ModManager.Content
             if (Main.MenuUI._currentState == need) return;
             Main.MenuUI.SetState(need);
             Main.MenuUI._history.RemoveAt(Main.MenuUI._history.Count - 1);
+            if (need == null)
+            {
+                Main.MenuUI._currentState = null;
+                Main.menuMode = 0;
+                Main.MenuUI._history.Clear();
+            }
             SoundEngine.PlaySound(SoundID.MenuOpen);
         }
     }
