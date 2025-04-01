@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,9 +12,11 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.Social.Steam;
 using Terraria.UI;
+using static Terraria.Localization.NetworkText;
 
 namespace ModManager
 {
@@ -77,24 +80,12 @@ namespace ModManager
             Interface.modPacksMenu.Append(new UIMMTopPanel());
             Interface.modSources.Append(new UIMMTopPanel());
         }
+
+
         public static void OpenFolder(string path)
         {
             if (System.IO.Directory.Exists(path)) Utils.OpenFolder(path);
         }
-        /*
-public override void PostSetupContent()
-{
-   if (ModLoader.TryGetMod("CompatChecker", out Mod mod))
-   {
-       new ILHook(mod.Code.GetType("CompatChecker.CompatChecker").GetMethod("DrawInModsMenu", BindingFlags.NonPublic | BindingFlags.Instance), IL_CompatChecker_DrawInModsMenu);
-   }
-}
-private void IL_CompatChecker_DrawInModsMenu(ILContext il)
-{
-   ILCursor c = new(il);
-   c = c.GotoNext(MoveType.Before, (p) => p.MatchStloc2());
-   c.EmitLdstr("The rewrited string");
-}*/
         public static LocalizedText Get(string name)
         {
             return Language.GetText("Mods.ModManager." + name);

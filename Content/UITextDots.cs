@@ -14,7 +14,7 @@ namespace ModManager.Content
         public const string Dots = "…";
         public float align;
         public bool big;
-        public override void OnInitialize()
+        public UITextDots()
         {
             IgnoresMouseInteraction = true;
         }

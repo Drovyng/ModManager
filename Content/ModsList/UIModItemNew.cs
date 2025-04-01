@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -45,6 +46,7 @@ namespace ModManager.Content.ModsList
         public string Name;
 
         public float timetograb;
+        public bool needUpdate;
 
         public List<string> References = new();
         public Vector2 grabbedPos;
@@ -121,9 +123,10 @@ namespace ModManager.Content.ModsList
                     Top = { Pixels = 4 }
                 };
                 Append(textAuthor);
+                needUpdate = WorkshopHelpMePlease.ModsRequireUpdates.Contains(mod.Name);
                 textVersion = new()
                 {
-                    text = "v" + mod.properties.version.ToString(),
+                    text = "v" + mod.properties.version.ToString() + (needUpdate ? " (" + Language.GetTextValue("Mods.ModManager.NeedUpdate") + ")" : ""),
                     Height = { Precent = 1 },
                     Top = { Pixels = 4 }
                 };
@@ -286,15 +289,18 @@ namespace ModManager.Content.ModsList
                     text2 = $"{recommended} v{mod.tModLoaderVersion}";
                     color = Color.Yellow;
                 }
+                cantUse = new UIPanel()
+                {
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    IgnoresMouseInteraction = true
+                };
+                Append(cantUse);
+                cantUse.BackgroundColor = cantUse.BorderColor = Color.Transparent;
                 if (text2 != null)
                 {
-                    cantUse = new UIPanel()
-                    {
-                        Width = { Precent = 1 },
-                        Height = { Precent = 1 },
-                        BackgroundColor = Color.Black * 0.65f,
-                        BorderColor = Color.Black * 0.65f,
-                    };
+                    cantUse.IgnoresMouseInteraction = false;
+                    cantUse.BorderColor = cantUse.BackgroundColor = Color.Black * 0.65f;
                     cantUse.OnMouseOver += delegate
                     {
                         SoundEngine.PlaySound(in SoundID.MenuTick);
@@ -314,7 +320,6 @@ namespace ModManager.Content.ModsList
                         Top = { Pixels = 4 }
                     };
                     cantUse.Append(cantUseText);
-                    Append(cantUse);
                 }
                 else
                 {
@@ -338,7 +343,7 @@ namespace ModManager.Content.ModsList
         }
         public void Set(bool? enabled = null)
         {
-            if (mod == null || cantUse != null) return;
+            if (mod == null || cantUseText != null) return;
 
             enabled ??= !mod.Enabled;
 
@@ -349,7 +354,7 @@ namespace ModManager.Content.ModsList
                 {
                     if (item.mod != null && l.Contains(item.mod.Name))
                     {
-                        if (item.cantUse != null) return;
+                        if (item.cantUseText != null) return;
                         item.Set(true);
                         l.Remove(item.mod.Name);
                     }
@@ -420,11 +425,9 @@ namespace ModManager.Content.ModsList
                     Append(divider2);
                     Append(divider3);
                 }
-                if (cantUse != null)
-                {
-                    Elements.Remove(cantUse);
-                    Elements.Add(cantUse);
-                }
+                Elements.Remove(cantUse);
+                Elements.Add(cantUse);
+                
 
                 toggle.Top = grid ? new(2, 0) : new(-12, 0.5f);
                 toggle.Left.Pixels = grid ? 2 : -2;
@@ -453,6 +456,8 @@ namespace ModManager.Content.ModsList
         {
             base.Update(gameTime);
 
+            var colors = ManagerConfigColors.Instance;
+
             if (timetograb > 0)
             {
                 timetograb -= (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -464,14 +469,21 @@ namespace ModManager.Content.ModsList
             }
             var t = UIModsNew.Instance.SelectedItems.Contains(this);
             IgnoresMouseInteraction = t && UIModsNew.Instance.GrabbedItem;
-            BackgroundColor = t ? new Color(103, 112, 201) : IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f;
-            BorderColor = t ? Color.Gold : Color.Black;
+            BackgroundColor = t ? colors.ColorBackgroundSelected : IsMouseHovering ? colors.ColorBackgroundHovered : colors.ColorBackgroundStatic;
+            BorderColor = t ? colors.ColorBorderHovered : colors.ColorBorderStatic;
+            if (needUpdate)
+            {
+                BackgroundColor.R = (byte)(MathHelper.Lerp(BackgroundColor.R, colors.ColorNeedUpdate.R, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.R * colors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.G = (byte)(MathHelper.Lerp(BackgroundColor.G, colors.ColorNeedUpdate.G, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.R * colors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.B = (byte)(MathHelper.Lerp(BackgroundColor.B, colors.ColorNeedUpdate.B, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.R * colors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.A = (byte)(MathHelper.Lerp(BackgroundColor.A, colors.ColorNeedUpdate.A, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.A * colors.ColorNeedUpdate.A / 255f);
+            }
             if (UIModsNew.Instance.GrabbedItem)
             {
                 if (mod == null && !t)
                 {
-                    BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
-                    BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;
+                    BackgroundColor = IsMouseHovering ? colors.ColorBackgroundSelected : colors.ColorBackgroundHovered;
+                    BorderColor = IsMouseHovering ? colors.ColorBorderAllowDropHovered : colors.ColorBorderAllowDrop;
                     if (IsMouseHovering)
                     {
                         UIModsNew.Instance.GrabbedFolder = string.Join("/", UIModsNew.Instance.OpenedPath) + "/" + Name + "/";
@@ -502,6 +514,8 @@ namespace ModManager.Content.ModsList
         }
         public override void LeftMouseDown(UIMouseEvent evt)
         {
+            timetograb = 0.4f;
+            grabbedPos = Main.MouseScreen;
             if (!UIModsNew.Instance.SelectedItems.Contains(this)){
                 if (Main.keyState.PressingControl())
                 {
@@ -530,16 +544,15 @@ namespace ModManager.Content.ModsList
                     UIModsNew.Instance.SelectedItems.Clear();
                     UIModsNew.Instance.SelectedItems.Add(this);
                 }
-                UIModsNew.Instance.ChangeSelection();
             }
             else if (Main.keyState.PressingControl())
             {
                 UIModsNew.Instance.SelectedItems.Remove(this);
             }
-            if (!UIModsNew.Instance.OpenedCollections)
+            UIModsNew.Instance.ChangeSelection();
+            if (UIModsNew.Instance.OpenedCollections || Main.keyState.PressingShift() || Main.keyState.PressingControl())
             {
-                timetograb = 0.4f;
-                grabbedPos = Main.MouseScreen;
+                timetograb = -2;
             }
             base.LeftMouseDown(evt);
         }

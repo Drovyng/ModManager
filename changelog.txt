@@ -1,1 +1,3 @@
-Hotfix: Updating Counters In Categories
+Fixed a lot of bugs.
+Added "Need Update" Status
+Added Color Scheme

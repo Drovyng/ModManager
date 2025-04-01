@@ -18,7 +18,7 @@ namespace ModManager.Content.ModsList
         public UIPanel CancelBG;
         public UITextDots<LocalizedText> Cancel;
         public Action<string> OnApply;
-        public Action<string> OnApplyCustom;
+        public Func<string, bool> OnApplyCustom;
         public override void OnInitialize()
         {
             SetPadding(8);
@@ -132,7 +132,10 @@ namespace ModManager.Content.ModsList
                 if (Input._currentString.Length == 0) return;
                 Top.Pixels = -100000;
                 resizing = false;
-                if (OnApplyCustom != null) OnApplyCustom(Input._currentString);
+                if (OnApplyCustom != null)
+                {
+                    if (!OnApplyCustom(Input._currentString)) return;
+                }
                 else OnApply(Input._currentString);
                 Recalculate();
                 OnApplyCustom = null;
@@ -147,7 +150,7 @@ namespace ModManager.Content.ModsList
             base.Update(gameTime);
             Input._currentString = Input._currentString.Replace("/", "");
         }
-        public void Popup(string origName, string Inputted, Action<string> onRename = null)
+        public void Popup(string origName, string Inputted, Func<string, bool> onRename = null)
         {
             resizing = false;
             Top.Pixels = 0;

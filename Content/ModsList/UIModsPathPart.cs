@@ -30,18 +30,19 @@ namespace ModManager.Content.ModsList
         }
         public override void Update(GameTime gameTime)
         {
+            var colors = ManagerConfigColors.Instance;
             if (UIModsNew.Instance.GrabbedItem)
             {
-                BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
-                BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;
+                BackgroundColor = IsMouseHovering ? colors.ColorBackgroundSelected : colors.ColorBackgroundHovered;
+                BorderColor = IsMouseHovering ? colors.ColorBorderAllowDropHovered : colors.ColorBorderAllowDrop;
                 if (IsMouseHovering)
                 {
                     UIModsNew.Instance.GrabbedFolder = path;
                 }
                 return;
             }
-            BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) * 0.75f : new Color(63, 82, 151) * 0.25f;
-            BorderColor = IsMouseHovering ? Color.Gold : Color.Black;
+            BackgroundColor = IsMouseHovering ? colors.ColorBackgroundHovered : colors.ColorBackgroundStatic;
+            BorderColor = IsMouseHovering ? colors.ColorBorderHovered : colors.ColorBorderStatic;
         }
     }
 

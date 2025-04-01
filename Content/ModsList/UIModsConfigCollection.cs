@@ -147,7 +147,7 @@ namespace ModManager.Content.ModsList
             {
                 UIModsNew.Instance.root.UseLeft = false;
             }
-            Panel.BackgroundColor = IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f;
+            Panel.BackgroundColor = IsMouseHovering ? ManagerConfigColors.Instance.ColorBackgroundHovered : ManagerConfigColors.Instance.ColorBackgroundStatic;
         }
         public override void LeftClick(UIMouseEvent evt)
         {

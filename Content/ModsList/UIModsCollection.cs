@@ -74,22 +74,23 @@ namespace ModManager.Content.ModsList
         }
         public override void Update(GameTime gameTime)
         {
+            var colors = ManagerConfigColors.Instance;
             if (Toggle != null && Toggle.IsMouseHovering)
             {
                 UIModsNew.Instance.root.UseLeft = false;
             }
             if (UIModsNew.Instance.GrabbedItem && !isAll)
             {
-                Panel.BackgroundColor = IsMouseHovering ? new Color(63, 82, 151) : new Color(63, 82, 151) * 0.75f;
-                Panel.BorderColor = IsMouseHovering ? Color.LightYellow : Color.Lime;
+                Panel.BackgroundColor = IsMouseHovering ? colors.ColorBackgroundSelected : colors.ColorBackgroundHovered;
+                Panel.BorderColor = IsMouseHovering ? colors.ColorBorderAllowDropHovered : colors.ColorBorderAllowDrop;
                 if (IsMouseHovering)
                 {
                     UIModsNew.Instance.GrabbedFolder = "collections/" + Text.text;
                 }
                 return;
             }
-            Panel.BackgroundColor = IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f;
-            Panel.BorderColor = UIModsNew.Instance.SelectedCollection == this ? Color.Gold : Color.Black;
+            Panel.BackgroundColor = IsMouseHovering ? colors.ColorBackgroundHovered : colors.ColorBackgroundStatic;
+            Panel.BorderColor = UIModsNew.Instance.SelectedCollection == this ? colors.ColorBorderHovered : colors.ColorBorderStatic;
         }
         public override void LeftClick(UIMouseEvent evt)
         {

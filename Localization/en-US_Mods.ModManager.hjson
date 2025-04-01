@@ -91,6 +91,55 @@ Configs: {
 			Tooltip: ""
 		}
 	}
+
+	ManagerConfigColors: {
+		DisplayName: Color Scheme
+
+		ColorBorderStatic: {
+			Label: Border Static
+			Tooltip: ""
+		}
+
+		ColorBorderHovered: {
+			Label: Border Hovered
+			Tooltip: ""
+		}
+
+		ColorBorderAllowDrop: {
+			Label: Border Allow Drop
+			Tooltip: ""
+		}
+
+		ColorBorderAllowDropHovered: {
+			Label: Border Allow Drop Hovered
+			Tooltip: ""
+		}
+
+		ColorBackgroundStatic: {
+			Label: Background Static
+			Tooltip: ""
+		}
+
+		ColorBackgroundHovered: {
+			Label: Background Hovered
+			Tooltip: ""
+		}
+
+		ColorBackgroundSelected: {
+			Label: Background Selected
+			Tooltip: ""
+		}
+
+		ColorBackgroundDisabled: {
+			Label: Color Background Disabled
+			Tooltip: ""
+		}
+
+		ColorNeedUpdate: {
+			Label: Color Need Update
+			Tooltip: ""
+		}
+	}
 }
 
 Apply: Apply
@@ -111,7 +160,7 @@ Disable: Disable
 CreateCollection: Create Collection
 CreateConfigCollection: Create Config Collection
 NoActions: No actions available
-ClickToReturn: Click To Return
+ClickToReturn: Leave Collections Mode
 ButtonConfig: Open Config
 ButtonApplyChanges: Apply Changes
 ButtonRejectChanges: Reject Changes
@@ -123,3 +172,7 @@ NumberEnabled: Enabled
 ChangedEnabled: Enabled
 ChangedDisabled: Disabled
 ChangedConfigs: Configs
+UpdateCheckAnalysing: Analysing Mods…
+UpdateCheckZero: All Mods Are Updated!
+UpdateCheckNeed: "{0} Mods Need Update!"
+NeedUpdate: Need Update

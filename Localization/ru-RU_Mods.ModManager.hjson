@@ -91,6 +91,55 @@ Configs: {
 			// Tooltip: ""
 		}
 	}
+
+	ManagerConfigColors: {
+		DisplayName: Цветовая Схема
+
+		ColorBorderStatic: {
+			// Label: Border Static
+			// Tooltip: ""
+		}
+
+		ColorBorderHovered: {
+			// Label: Border Hovered
+			// Tooltip: ""
+		}
+
+		ColorBorderAllowDrop: {
+			// Label: Border Allow Drop
+			// Tooltip: ""
+		}
+
+		ColorBorderAllowDropHovered: {
+			// Label: Border Allow Drop Hovered
+			// Tooltip: ""
+		}
+
+		ColorBackgroundStatic: {
+			// Label: Background Static
+			// Tooltip: ""
+		}
+
+		ColorBackgroundHovered: {
+			// Label: Background Hovered
+			// Tooltip: ""
+		}
+
+		ColorBackgroundSelected: {
+			// Label: Background Selected
+			// Tooltip: ""
+		}
+
+		ColorBackgroundDisabled: {
+			// Label: Color Background Disabled
+			// Tooltip: ""
+		}
+
+		ColorNeedUpdate: {
+			// Label: Color Need Update
+			// Tooltip: ""
+		}
+	}
 }
 
 Apply: Применить
@@ -111,7 +160,7 @@ Disable: Выключить
 CreateCollection: Создать Коллекцию
 CreateConfigCollection: Создать Конфиг-Коллекцию
 NoActions: Нет доступных действий
-ClickToReturn: Нажмите для Возврата
+ClickToReturn: Покинуть Режим Коллекций
 ButtonConfig: Конфигурация
 ButtonApplyChanges: Применить Изменения
 ButtonRejectChanges: Отклонить Изменения
@@ -123,3 +172,7 @@ NumberEnabled: Включено
 ChangedEnabled: Включённые
 ChangedDisabled: Выключенные
 ChangedConfigs: Конфиги
+UpdateCheckAnalysing: Анализирование Модов…
+UpdateCheckZero: Все Моды Обновлены!
+UpdateCheckNeed: "{0} Модов Не Обновлены!"
+NeedUpdate: Требует Обновление

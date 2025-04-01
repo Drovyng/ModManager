@@ -111,6 +111,23 @@ namespace ModManager.Content.ModsList
             Height.Set(posY, 0);
             Recalculate();
         }
+        private bool RenameCollection(string value)
+        {
+            var cfg = DataConfig.Instance;
+            if (cfg.Collections.ContainsKey(value)) return false;
+            var l = cfg.Collections[UIModsNew.Instance.SelectedCollection.Text.text];
+            cfg.Collections.Remove(UIModsNew.Instance.SelectedCollection.Text.text);
+            cfg.Collections[value] = l;
+            cfg.Save();
+            UIModsNew.Instance.AddCollections();
+            if (UIModsNew.Instance.OpenedCollections && UIModsNew.Instance.OpenedPath.Count > 0 && UIModsNew.Instance.OpenedPath[0] == UIModsNew.Instance.SelectedCollection.Text.text)
+            {
+                UIModsNew.Instance.OpenedPath.Clear();
+                UIModsNew.Instance.OpenedPath.Add(value);
+                UIModsNew.Instance.RecalculatePath();
+            }
+            return true;
+        }
         public void ClickAction(string Name)
         {
             switch (Name)
@@ -143,6 +160,10 @@ namespace ModManager.Content.ModsList
                             cfg1.Collections[name] = new List<string>();
                             cfg1.Save();
                             UIModsNew.Instance.AddCollections();
+
+                            UIModsNew.Instance.SelectedCollection = UIModsNew.Instance.collecListIn.Elements.Find((el) => ((UIModsCollection)el).Text.text == name) as UIModsCollection;
+                            UIModsNew.Instance.popupRename.Popup(UIModsNew.Instance.SelectedCollection.Text.text, UIModsNew.Instance.SelectedCollection.Text.text, RenameCollection);
+
                             return;
                         }
                         i1++;
@@ -167,21 +188,23 @@ namespace ModManager.Content.ModsList
                     var t = Target as UIModsConfigCollection;
                     UIModsNew.Instance.popupRename.Popup(t.Text.text, t.Text.text, (value) =>
                     {
+                        var cfg = DataConfig.Instance;
+                        if (cfg.ConfigCollections.Contains(value)) return false;
                         try
                         {
                             UIModsConfigCollection.Rename(t.Text.text, value);
                         }
                         catch (Exception e)
                         {
+                            System.Windows.Forms.MessageBox.Show(e.ToString(), "Failed To Rename Config", icon: System.Windows.Forms.MessageBoxIcon.Error);
                             ModManager.OpenFolder(Path.Combine(ConfigManager.ModConfigPath, "Collection_" + t.Text.text));
                             ModManager.OpenFolder(Path.Combine(ConfigManager.ModConfigPath, "Collection_" + value));
-                            System.Windows.Forms.MessageBox.Show(e.ToString(), "Failed To Rename Config", icon: System.Windows.Forms.MessageBoxIcon.Error);
                         }
-                        var cfg = DataConfig.Instance;
                         cfg.ConfigCollections.Remove(t.Text.text);
                         cfg.ConfigCollections.Add(value);
                         cfg.Save();
                         UIModsNew.Instance.AddConfigCollections();
+                        return true;
                     });
                     return;
                 case "DeleteConfigCollection":
@@ -192,8 +215,8 @@ namespace ModManager.Content.ModsList
                     }
                     catch (Exception e)
                     {
-                        ModManager.OpenFolder(Path.Combine(ConfigManager.ModConfigPath, "Collection_" + t2.Text.text));
                         System.Windows.Forms.MessageBox.Show(e.ToString(), "Failed To Delete Config", icon: System.Windows.Forms.MessageBoxIcon.Error);
+                        ModManager.OpenFolder(Path.Combine(ConfigManager.ModConfigPath, "Collection_" + t2.Text.text));
                     }
                     DataConfig.Instance.ConfigCollections.Remove((Target as UIModsConfigCollection).Text.text);
                     DataConfig.Instance.Save();
@@ -209,21 +232,7 @@ namespace ModManager.Content.ModsList
                     return;
                 case "RenameCollection":
                     if (UIModsNew.Instance.SelectedCollection == null) return;
-                    UIModsNew.Instance.popupRename.Popup(UIModsNew.Instance.SelectedCollection.Text.text, UIModsNew.Instance.SelectedCollection.Text.text, (value) =>
-                    {
-                        var cfg = DataConfig.Instance;
-                        var l = cfg.Collections[UIModsNew.Instance.SelectedCollection.Text.text];
-                        cfg.Collections.Remove(UIModsNew.Instance.SelectedCollection.Text.text);
-                        cfg.Collections[value] = l;
-                        cfg.Save();
-                        UIModsNew.Instance.AddCollections();
-                        if (UIModsNew.Instance.OpenedCollections && UIModsNew.Instance.OpenedPath.Count > 0 && UIModsNew.Instance.OpenedPath[0] == UIModsNew.Instance.SelectedCollection.Text.text)
-                        {
-                            UIModsNew.Instance.OpenedPath.Clear();
-                            UIModsNew.Instance.OpenedPath.Add(value);
-                            UIModsNew.Instance.RecalculatePath();
-                        }
-                    });
+                    UIModsNew.Instance.popupRename.Popup(UIModsNew.Instance.SelectedCollection.Text.text, UIModsNew.Instance.SelectedCollection.Text.text, RenameCollection);
                     return;
                 case "Delete":
                     if (UIModsNew.Instance.SelectedItem == null) return;

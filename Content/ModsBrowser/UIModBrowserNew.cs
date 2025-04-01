@@ -36,7 +36,7 @@ namespace ModManager.Content.ModsBrowser
         {
             "Name", "Author", "Date"
         };
-
+        
         public UIModBrowserNew(SocialBrowserModule socialBackend) : base(socialBackend)
         {
             Instance = this;
