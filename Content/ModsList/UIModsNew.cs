@@ -110,14 +110,21 @@ namespace ModManager.Content.ModsList
             LoadingImage.Color = Color.White;
             ReloadTask = Task.Run(delegate
             {
-                List<UIModItemNew> list = new List<UIModItemNew>();
-                LocalMod[] array = ModOrganizer.FindMods(true);
-                for (int i = 0; i < array.Length; i++)
+                try
                 {
-                    UIModItemNew item = new UIModItemNew(array[i]);
-                    list.Add(item);
+                    List<UIModItemNew> list = new List<UIModItemNew>();
+                    LocalMod[] array = ModOrganizer.FindMods(true);
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        UIModItemNew item = new UIModItemNew(array[i]);
+                        list.Add(item);
+                    }
+                    return list;
                 }
-                return list;
+                catch (Exception)
+                {
+                    return null;
+                }
             }, _cts.Token);
         }
         public void ActRename(string value)
@@ -510,7 +517,7 @@ namespace ModManager.Content.ModsList
                 {
                     if (!WorkshopHelpMePlease.ModsRequireUpdatesLoading && numUpdateStatus._dimensions.ToRectangle().Contains(Main.mouseX, Main.mouseY) && WorkshopHelpMePlease.ModsRequireUpdates.Count != 0)
                     {
-                        UICommon.TooltipMouseText(string.Join("\n", WorkshopHelpMePlease.ModsRequireUpdates));
+                        Tooltip = string.Join("\n", WorkshopHelpMePlease.ModsRequireUpdates);
                     }
                 };
                 BottomCounter.Append(numUpdateStatus);
@@ -1256,9 +1263,17 @@ namespace ModManager.Content.ModsList
             GrabbedFolder = null;
             if (ReloadTask != null && ReloadTask.IsCompleted)
             {
-                uIMods = ReloadTask.Result;
+                if (ReloadTask.Result != null)
+                {
+                    uIMods = ReloadTask.Result;
+                    LoadingImage.Color = Color.Transparent;
+                }
+                else
+                {
+                    uIMods.Clear();
+                    waitForReload = true;
+                }
                 ReloadTask = null;
-                LoadingImage.Color = Color.Transparent;
                 if (waitForReload)
                 {
                     ReloadModsTask();

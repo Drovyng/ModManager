@@ -1,3 +1,2 @@
-Fixed a lot of bugs.
-Added "Need Update" Status
-Added Color Scheme
+Fixed Crash Bug
+Fixed Status Bar Hovering
