@@ -12,17 +12,17 @@ namespace ModManager.Content
 {
     public class UIMMTopPanel : UIPanel
     {
-        public UIPanel buttonBack;
-        public UIPanel buttonMods;
-        public UIPanel buttonModBrowser;
-        public UIPanel buttonModPacks;
-        public UIPanel buttonModDevelop;
+        public UIPanelStyled buttonBack;
+        public UIPanelStyled buttonMods;
+        public UIPanelStyled buttonModBrowser;
+        public UIPanelStyled buttonModPacks;
+        public UIPanelStyled buttonModDevelop;
         public override void OnInitialize()
         {
             SetPadding(0);
             Height.Set(40, 0);
 
-            buttonBack = new UIPanel().WithFadedMouseOver();
+            buttonBack = new UIPanelStyled().FadedMouseOver();
             buttonBack.Height.Precent = 1;
             buttonBack.Append(new UIText(Language.GetText("UI.Back"), 0.6f, true)
             {
@@ -32,7 +32,7 @@ namespace ModManager.Content
             buttonBack.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
             Append(buttonBack);
 
-            buttonMods = new UIPanel().WithFadedMouseOver();
+            buttonMods = new UIPanelStyled().FadedMouseOver();
             buttonMods.Height.Precent = 1;
             buttonMods.Append(new UIText(Language.GetText("tModLoader.MenuManageMods"), 0.6f, true)
             {
@@ -42,7 +42,7 @@ namespace ModManager.Content
             buttonMods.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
             Append(buttonMods);
 
-            buttonModBrowser = new UIPanel().WithFadedMouseOver();
+            buttonModBrowser = new UIPanelStyled().FadedMouseOver();
             buttonModBrowser.Height.Precent = 1;
             buttonModBrowser.Append(new UIText(Language.GetText("tModLoader.MenuModBrowser"), 0.6f, true)
             {
@@ -52,7 +52,7 @@ namespace ModManager.Content
             buttonModBrowser.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
             Append(buttonModBrowser);
 
-            buttonModPacks = new UIPanel().WithFadedMouseOver();
+            buttonModPacks = new UIPanelStyled().FadedMouseOver();
             buttonModPacks.Height.Precent = 1;
             buttonModPacks.Append(new UIText(Language.GetText("tModLoader.ModsModPacks"), 0.6f, true)
             {
@@ -62,7 +62,7 @@ namespace ModManager.Content
             buttonModPacks.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
             Append(buttonModPacks);
 
-            buttonModDevelop = new UIPanel().WithFadedMouseOver();
+            buttonModDevelop = new UIPanelStyled().FadedMouseOver();
             buttonModDevelop.Height.Precent = 1;
             buttonModDevelop.Append(new UIText(Language.GetText("tModLoader.MenuDevelopMods"), 0.6f, true)
             {
@@ -101,16 +101,16 @@ namespace ModManager.Content
         }
         public override void Update(GameTime gameTime)
         {
-            buttonMods.BorderColor = Main.MenuUI._currentState == Interface.modsMenu ? Color.Gold : Color.Black;
-            buttonModBrowser.BorderColor = Main.MenuUI._currentState == Interface.modBrowser ? Color.Gold : Color.Black;
-            buttonModPacks.BorderColor = Main.MenuUI._currentState == Interface.modPacksMenu ? Color.Gold : Color.Black;
-            buttonModDevelop.BorderColor = Main.MenuUI._currentState == Interface.modSources ? Color.Gold : Color.Black;
+            buttonMods.BorderColor = Main.MenuUI._currentState == Interface.modsMenu ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
+            buttonModBrowser.BorderColor = Main.MenuUI._currentState == Interface.modBrowser ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
+            buttonModPacks.BorderColor = Main.MenuUI._currentState == Interface.modPacksMenu ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
+            buttonModDevelop.BorderColor = Main.MenuUI._currentState == Interface.modSources ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
 
-            buttonBack.BackgroundColor = buttonBack.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver;
-            buttonMods.BackgroundColor = Main.MenuUI._currentState == Interface.modsMenu ? new Color(93, 102, 171) * 0.7f : (buttonMods.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver);
-            buttonModBrowser.BackgroundColor = Main.MenuUI._currentState == Interface.modBrowser ? new Color(93, 102, 171) * 0.7f : (buttonModBrowser.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver);
-            buttonModPacks.BackgroundColor = Main.MenuUI._currentState == Interface.modPacksMenu ? new Color(93, 102, 171) * 0.7f : (buttonModPacks.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver);
-            buttonModDevelop.BackgroundColor = Main.MenuUI._currentState == Interface.modSources ? new Color(93, 102, 171) * 0.7f : (buttonModDevelop.IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlueMouseOver);
+            buttonBack.BackgroundColor = buttonBack.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
+            buttonMods.BackgroundColor = Main.MenuUI._currentState == Interface.modsMenu ? UIColors.ColorBackgroundSelected : (buttonMods.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
+            buttonModBrowser.BackgroundColor = Main.MenuUI._currentState == Interface.modBrowser ? UIColors.ColorBackgroundSelected : (buttonModBrowser.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
+            buttonModPacks.BackgroundColor = Main.MenuUI._currentState == Interface.modPacksMenu ? UIColors.ColorBackgroundSelected : (buttonModPacks.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
+            buttonModDevelop.BackgroundColor = Main.MenuUI._currentState == Interface.modSources ? UIColors.ColorBackgroundSelected : (buttonModDevelop.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
 
             base.Update(gameTime);
         }

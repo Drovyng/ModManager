@@ -9,9 +9,9 @@ namespace ModManager.Content.ModsList
     {
         public UITextDots<LocalizedText> Title;
         public UITextDots<LocalizedText> Description;
-        public UIPanel ConfirmBG;
+        public UIPanelStyled ConfirmBG;
         public UITextDots<LocalizedText> Confirm;
-        public UIPanel CancelBG;
+        public UIPanelStyled CancelBG;
         public UITextDots<LocalizedText> Cancel;
         public Action OnApply;
         public override void OnInitialize()

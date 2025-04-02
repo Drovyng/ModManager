@@ -100,7 +100,7 @@ namespace ModManager.Content.ModsBrowser
             Append(mainScrollbar);
             Append(mainList);
 
-            AddCategories();
+            //AddCategories();
             Redesign();
         }
         public override void Update(GameTime gameTime)
@@ -129,6 +129,7 @@ namespace ModManager.Content.ModsBrowser
             mainList.Recalculate();
             mainScrollbar.SetView(mainList.GetInnerDimensions().Height, pos.Y);
         }
+        /*
         public void AddCategories()
         {
             categoriesHorizontal.Elements.Clear();
@@ -167,7 +168,7 @@ namespace ModManager.Content.ModsBrowser
                 }
                 for (int j = i + 1; j < Categories.Count - 1; j++)
                 {
-                    item.RightElem.Add(categoriesHorizontal.Elements[j]);
+                    item.RightElem.Add(categoriesHorizontal.Elements[j-1]);
                 }
             }
             if (scale < scaleThreshold)
@@ -180,5 +181,6 @@ namespace ModManager.Content.ModsBrowser
             }
             categoriesHorizontal.Activate();
         }
+        */
     }
 }

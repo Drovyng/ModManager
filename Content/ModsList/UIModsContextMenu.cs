@@ -12,6 +12,7 @@ using Terraria.Localization;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
+using Terraria.GameContent.ItemDropRules;
 
 namespace ModManager.Content.ModsList
 {
@@ -56,26 +57,34 @@ namespace ModManager.Content.ModsList
                 if (!UIModsNew.Instance.SelectedItems.Contains(uIMod))
                     UIModsNew.Instance.SelectedItems.Add(uIMod);
                 UIModsNew.Instance.ChangeSelection();
-                var folder = uIMod.mod == null;
-                if (!UIModsNew.Instance.OpenedCollections)
+                if (uIMod.mod == null)
                 {
                     AddAction("CreateFolder");
-                    AddSeparator();
-                }
-                if (UIModsNew.Instance.SelectedItem != null)
-                {
-                    AddAction("Info", folder);
-                    AddAction(folder ? "Enable" : uIMod.mod.Enabled ? "Disable" : "Enable", folder);
                     AddAction("Rename");
-                    AddAction(UIModsNew.Instance.OpenedCollections ? "Remove" : "Delete");
+                    AddAction("Delete", UIModsNew.Instance.SelectedItem == null);
                 }
                 else
                 {
-                    AddAction("Info", true);
-                    AddAction("Enable");
-                    AddAction("Disable");
-                    AddAction("Rename", true);
-                    if (UIModsNew.Instance.OpenedCollections) AddAction("Remove");
+                    if (!UIModsNew.Instance.OpenedCollections)
+                    {
+                        AddAction("CreateFolder");
+                        AddSeparator();
+                    }
+                    if (UIModsNew.Instance.SelectedItem != null)
+                    {
+                        AddAction("Info");
+                        AddAction(uIMod.mod.Enabled ? "Disable" : "Enable");
+                        AddAction("Rename");
+                        AddAction(UIModsNew.Instance.OpenedCollections ? "Remove" : "Delete");
+                    }
+                    else
+                    {
+                        AddAction("Info", true);
+                        AddAction("Enable");
+                        AddAction("Disable");
+                        AddAction("Rename", true);
+                        if (UIModsNew.Instance.OpenedCollections) AddAction("Remove");
+                    }
                 }
             }
             else if (coll != null && !coll.isAll)
@@ -92,7 +101,11 @@ namespace ModManager.Content.ModsList
                 AddAction("RenameConfigCollection");
                 AddAction("DeleteConfigCollection");
             }
-            else if (Target == UIModsNew.Instance.mainListIn && !!UIModsNew.Instance.OpenedCollections)
+            else if (Target == UIModsNew.Instance.mainListIn && !UIModsNew.Instance.OpenedCollections)
+            {
+                AddAction("CreateFolder");
+            }
+            else if (Target == UIModsNew.Instance.mainList && !UIModsNew.Instance.OpenedCollections)
             {
                 AddAction("CreateFolder");
             }
@@ -145,6 +158,11 @@ namespace ModManager.Content.ModsList
                             cfg.Folders.Add(name);
                             cfg.Save();
                             UIModsNew.Instance.UpdateDisplayed();
+                            UIModsNew.Instance.SelectedItems.Clear();
+                            UIModsNew.Instance.SelectedItems.Add(UIModsNew.Instance.mainListIn.Elements.Find((el) => (el as UIModItemNew).mod == null && (el as UIModItemNew).Name == name) as UIModItemNew);
+                            UIModsNew.Instance.popupRename.OnApplyCustom = null;
+                            UIModsNew.Instance.popupRename.Popup(name.Substring(path.Length), name.Substring(path.Length));
+                            UIModsNew.Instance.popupRename.Input._currentString = "";
                             return;
                         }
                         i++;
@@ -163,7 +181,7 @@ namespace ModManager.Content.ModsList
 
                             UIModsNew.Instance.SelectedCollection = UIModsNew.Instance.collecListIn.Elements.Find((el) => ((UIModsCollection)el).Text.text == name) as UIModsCollection;
                             UIModsNew.Instance.popupRename.Popup(UIModsNew.Instance.SelectedCollection.Text.text, UIModsNew.Instance.SelectedCollection.Text.text, RenameCollection);
-
+                            UIModsNew.Instance.popupRename.Input._currentString = "";
                             return;
                         }
                         i1++;
@@ -196,7 +214,7 @@ namespace ModManager.Content.ModsList
                         }
                         catch (Exception e)
                         {
-                            System.Windows.Forms.MessageBox.Show(e.ToString(), "Failed To Rename Config", icon: System.Windows.Forms.MessageBoxIcon.Error);
+                            System.Windows.Forms.MessageBox.Show((e is IOException) ? "Access to the collection path is denied.\nYou can run game as admin to fix that." : e.ToString(), "Failed To Rename Config", icon: System.Windows.Forms.MessageBoxIcon.Error);
                             ModManager.OpenFolder(Path.Combine(ConfigManager.ModConfigPath, "Collection_" + t.Text.text));
                             ModManager.OpenFolder(Path.Combine(ConfigManager.ModConfigPath, "Collection_" + value));
                         }
@@ -215,7 +233,7 @@ namespace ModManager.Content.ModsList
                     }
                     catch (Exception e)
                     {
-                        System.Windows.Forms.MessageBox.Show(e.ToString(), "Failed To Delete Config", icon: System.Windows.Forms.MessageBoxIcon.Error);
+                        System.Windows.Forms.MessageBox.Show((e is IOException) ? "Access to the collection path is denied.\nYou can run game as admin to fix that." : e.ToString(), "Failed To Delete Config", icon: System.Windows.Forms.MessageBoxIcon.Error);
                         ModManager.OpenFolder(Path.Combine(ConfigManager.ModConfigPath, "Collection_" + t2.Text.text));
                     }
                     DataConfig.Instance.ConfigCollections.Remove((Target as UIModsConfigCollection).Text.text);

@@ -52,17 +52,15 @@ namespace ModManager.Content.ModsList
         {
             base.Update(gameTime);
 
-            var colors = ManagerConfigColors.Instance;
-
             if (UIModsNew.Instance.GrabbedItem)
             {
-                BackgroundColor = IsMouseHovering ? colors.ColorBackgroundSelected : colors.ColorBackgroundHovered;
-                BorderColor = IsMouseHovering ? colors.ColorBorderAllowDropHovered : colors.ColorBorderAllowDrop;
+                BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundSelected : UIColors.ColorBackgroundHovered;
+                BorderColor = IsMouseHovering ? UIColors.ColorBorderAllowDropHovered : UIColors.ColorBorderAllowDrop;
             }
             else
             {
-                BackgroundColor = IsMouseHovering ? colors.ColorBackgroundHovered : colors.ColorBackgroundStatic;
-                BorderColor = IsMouseHovering ? colors.ColorBorderHovered : colors.ColorBorderStatic;
+                BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
+                BorderColor = IsMouseHovering ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
             }
             if (resizing)
             {

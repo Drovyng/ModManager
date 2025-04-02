@@ -25,7 +25,7 @@ namespace ModManager.Content
             filler = new(Main.Assets.Request<Texture2D>("Images/UI/ScrollbarInner"))
             {
                 IgnoresMouseInteraction = true,
-                Color = new Color(0.9f, 0.9f, 0.9f),
+                Color = UIColors.ColorSliders,
                 Rotation = MathHelper.PiOver2,
                 NormalizedOrigin = Vector2.One * 0.5f,
                 Left = { Pixels = -10, Precent = (value - minimum) / maximum },
@@ -61,7 +61,7 @@ namespace ModManager.Content
         public override void DrawSelf(SpriteBatch spriteBatch)
         {
             var c = GetOuterDimensions();
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)c.X, (int)(c.Y + c.Height * 0.5f - 3), (int)c.Width, 6), UICommon.MainPanelBackground);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)c.X, (int)(c.Y + c.Height * 0.5f - 1), (int)c.Width, 2), UIColors.ColorInvert);
         }
     }
 }

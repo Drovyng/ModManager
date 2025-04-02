@@ -4,7 +4,7 @@ using Terraria.GameContent;
 
 namespace ModManager.Content.ModsList
 {
-    public class UIModsPathPart : UIPanel
+    public class UIModsPathPart : UIPanelStyled
     {
         public UITextDots<string> Text;
         public string path;
@@ -30,19 +30,18 @@ namespace ModManager.Content.ModsList
         }
         public override void Update(GameTime gameTime)
         {
-            var colors = ManagerConfigColors.Instance;
             if (UIModsNew.Instance.GrabbedItem)
             {
-                BackgroundColor = IsMouseHovering ? colors.ColorBackgroundSelected : colors.ColorBackgroundHovered;
-                BorderColor = IsMouseHovering ? colors.ColorBorderAllowDropHovered : colors.ColorBorderAllowDrop;
+                BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundSelected : UIColors.ColorBackgroundHovered;
+                BorderColor = IsMouseHovering ? UIColors.ColorBorderAllowDropHovered : UIColors.ColorBorderAllowDrop;
                 if (IsMouseHovering)
                 {
                     UIModsNew.Instance.GrabbedFolder = path;
                 }
                 return;
             }
-            BackgroundColor = IsMouseHovering ? colors.ColorBackgroundHovered : colors.ColorBackgroundStatic;
-            BorderColor = IsMouseHovering ? colors.ColorBorderHovered : colors.ColorBorderStatic;
+            BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
+            BorderColor = IsMouseHovering ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
         }
     }
 

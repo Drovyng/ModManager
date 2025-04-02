@@ -1,22 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ModManager.Content;
+using ModManager.Content.ModsBrowser;
 using ModManager.Content.ModsList;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
 using ReLogic.Content;
 using Terraria;
+using Terraria.Audio;
+using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
-using Terraria.Social.Steam;
-using Terraria.UI;
-using static Terraria.Localization.NetworkText;
 
 namespace ModManager
 {
@@ -40,11 +37,14 @@ namespace ModManager
         public static Asset<Texture2D> AssetIconServer;
         public static Asset<Texture2D> AssetIconClient;
 
+        public static Asset<Texture2D> AssetStyledBorder;
+        public static Asset<Texture2D> AssetStyledBackground;
+
         public static bool SizedMouse;
         public static float SizedMouseRotation;
 
         public static readonly IList<string> BadMods = [
-            "ConciseModList", "SmartModManagement", "ModSideIcon", "CompactMods"
+            "ConciseModList", "SmartModManagement", "ModSideIcon", "CompactMods", "ModFolder"
         ];
         public override void Load()
         {
@@ -60,8 +60,12 @@ namespace ModManager
             }
             Instance = this;
 
-            AssetIconServer = Assets.Request<Texture2D>("Assets/ServerIcon", AssetRequestMode.ImmediateLoad);
+            AssetStyledBorder = Assets.Request<Texture2D>("Assets/StyledBorder", AssetRequestMode.ImmediateLoad);
+            AssetStyledBackground = Assets.Request<Texture2D>("Assets/StyledBackground", AssetRequestMode.ImmediateLoad);
+
+
             AssetIconClient = Assets.Request<Texture2D>("Assets/ClientIcon", AssetRequestMode.ImmediateLoad);
+            AssetIconServer = Assets.Request<Texture2D>("Assets/ServerIcon", AssetRequestMode.ImmediateLoad);
             AssetSettingsToggle = Assets.Request<Texture2D>("Assets/Settings_Toggle", AssetRequestMode.ImmediateLoad);
             AssetToggleOn = Assets.Request<Texture2D>("Assets/ToggleOn", AssetRequestMode.ImmediateLoad);
             AssetToggleHalf = Assets.Request<Texture2D>("Assets/ToggleHalf", AssetRequestMode.ImmediateLoad);
@@ -75,10 +79,75 @@ namespace ModManager
             On_Main.DrawCursor += Main_DrawCursor;
             On_Main.DoDraw += On_Main_DoDraw;
 
+            UIColors.SetConfig();
+
             Interface.modsMenu = new UIModsNew();
+            //Interface.modBrowser = new UIModBrowserNew(Interface.modBrowser.SocialBackend);
             Interface.modBrowser.Append(new UIMMTopPanel());
             Interface.modPacksMenu.Append(new UIMMTopPanel());
             Interface.modSources.Append(new UIMMTopPanel());
+
+            if (ManagerConfig.Instance.ModLoadingUpgrade && !(Interface.loadMods.Elements[Interface.loadMods.Elements.Count - 1] is UIPanel))
+            {
+                Interface.loadMods.OnUpdate += LoadMods_OnUpdate;
+            }
+        }
+        public void InitializeLoadModsMenu()
+        {
+            var pan = new UIPanel()
+            {
+                VAlign = 1f,
+                HAlign = 1f,
+                Width = { Precent = 0.345f, },
+                Height = { Precent = 0.35f },
+                OverflowHidden = true
+            };
+            pan.SetPadding(8);
+            pan.OnUpdate += delegate
+            {
+                var text = Interface.loadMods.DisplayText;
+                if (pan.Elements.Count == 0)
+                {
+                    pan.Append(new UIText(Interface.loadMods._cts.GetHashCode().ToString(), 1, false)
+                    {
+                        TextColor = Color.Transparent
+                    });
+                    return;
+                }
+                if ((pan.Elements[0] as UIText).Text != Interface.loadMods._cts.GetHashCode().ToString())
+                {
+                    pan.RemoveAllChildren();
+                    return;
+                }
+                if ((pan.Elements.Count == 1 || (pan.Elements[pan.Elements.Count - 1] as UIText).Text != text) && text != null)
+                {
+                    int i = 1;
+                    while (i < pan.Elements.Count)
+                    {
+                        pan.Elements[i].Top.Pixels += 24;
+                        if (pan.Elements[i].Top.Pixels > Main.screenHeight * 0.4f)
+                        {
+                            pan.Elements[i].Remove();
+                            continue;
+                        }
+                        i++;
+                    }
+                    pan.Append(new UIText(text ?? "", 1, false)
+                    {
+                        TextOriginX = 0.5f,
+                        TextOriginY = 0.5f,
+                        Width = { Precent = 1 },
+                        Height = { Pixels = 24 }
+                    });
+                    pan.Recalculate();
+                }
+            };
+            Interface.loadMods.Append(pan);
+        }
+        private void LoadMods_OnUpdate(Terraria.UI.UIElement affectedElement)
+        {
+            InitializeLoadModsMenu();
+            Interface.loadMods.OnUpdate -= LoadMods_OnUpdate;
         }
 
 

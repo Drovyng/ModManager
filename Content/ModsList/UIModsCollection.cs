@@ -7,7 +7,7 @@ namespace ModManager.Content.ModsList
     public class UIModsCollection : UIElement
     {
         public UITextDots<string> Text;
-        public UIPanel Panel;
+        public UIPanelStyled Panel;
         public UIImage Toggle;
         public bool isAll;
         public bool toggleEnable;
@@ -74,23 +74,22 @@ namespace ModManager.Content.ModsList
         }
         public override void Update(GameTime gameTime)
         {
-            var colors = ManagerConfigColors.Instance;
             if (Toggle != null && Toggle.IsMouseHovering)
             {
                 UIModsNew.Instance.root.UseLeft = false;
             }
             if (UIModsNew.Instance.GrabbedItem && !isAll)
             {
-                Panel.BackgroundColor = IsMouseHovering ? colors.ColorBackgroundSelected : colors.ColorBackgroundHovered;
-                Panel.BorderColor = IsMouseHovering ? colors.ColorBorderAllowDropHovered : colors.ColorBorderAllowDrop;
+                Panel.BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundSelected : UIColors.ColorBackgroundHovered;
+                Panel.BorderColor = IsMouseHovering ? UIColors.ColorBorderAllowDropHovered : UIColors.ColorBorderAllowDrop;
                 if (IsMouseHovering)
                 {
                     UIModsNew.Instance.GrabbedFolder = "collections/" + Text.text;
                 }
                 return;
             }
-            Panel.BackgroundColor = IsMouseHovering ? colors.ColorBackgroundHovered : colors.ColorBackgroundStatic;
-            Panel.BorderColor = UIModsNew.Instance.SelectedCollection == this ? colors.ColorBorderHovered : colors.ColorBorderStatic;
+            Panel.BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
+            Panel.BorderColor = UIModsNew.Instance.SelectedCollection == this ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
         }
         public override void LeftClick(UIMouseEvent evt)
         {

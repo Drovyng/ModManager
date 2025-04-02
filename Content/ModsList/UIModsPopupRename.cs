@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.ModLoader.UI;
@@ -9,13 +10,13 @@ namespace ModManager.Content.ModsList
     public class UIModsPopupRename : UIPanelSizeable
     {
         public UITextDots<LocalizedText> Title;
-        public UIPanel OrigBG;
+        public UIPanelStyled OrigBG;
         public UITextDots<string> Orig;
-        public UIPanel InputBG;
+        public UIPanelStyled InputBG;
         public UIInputTextFieldPriority<string> Input;
-        public UIPanel ApplyBG;
+        public UIPanelStyled ApplyBG;
         public UITextDots<LocalizedText> Apply;
-        public UIPanel CancelBG;
+        public UIPanelStyled CancelBG;
         public UITextDots<LocalizedText> Cancel;
         public Action<string> OnApply;
         public Func<string, bool> OnApplyCustom;
@@ -28,8 +29,6 @@ namespace ModManager.Content.ModsList
             HAlign = VAlign = 0.5f;
             centered = true;
             UseLeft = UseRight = true;
-
-            BackgroundColor = UICommon.DefaultUIBlue * 0.825f;
 
             UIModsNew.Instance.ChangeSelection += () =>
             {
@@ -58,6 +57,7 @@ namespace ModManager.Content.ModsList
             {
                 Width = { Precent = 1 },
                 Height = { Precent = 1 },
+                Top = { Pixels = 4 },
                 align = 0.5f,
             };
             OrigBG.Append(Orig);
@@ -118,7 +118,7 @@ namespace ModManager.Content.ModsList
             CancelBG.Append(Cancel);
             Append(CancelBG);
 
-            CancelBG.OnLeftClick += (e, l) =>
+            CancelBG.OnLeftClick += delegate
             {
                 Top.Pixels = -100000;
                 resizing = false;
@@ -126,17 +126,17 @@ namespace ModManager.Content.ModsList
                 OnApplyCustom = null;
             };
 
-            ApplyBG.OnLeftClick += (e, l) =>
+            ApplyBG.OnLeftClick += delegate
             {
-                Input._currentString = Input._currentString.Replace("/", "");
+                Input._currentString = Input._currentString.Replace("¶", "");
                 if (Input._currentString.Length == 0) return;
                 Top.Pixels = -100000;
                 resizing = false;
                 if (OnApplyCustom != null)
                 {
-                    if (!OnApplyCustom(Input._currentString)) return;
+                    if (!OnApplyCustom(Input._currentString.Replace("/", "¶"))) return;
                 }
-                else OnApply(Input._currentString);
+                else OnApply(Input._currentString.Replace("/", "¶"));
                 Recalculate();
                 OnApplyCustom = null;
             };
@@ -148,15 +148,17 @@ namespace ModManager.Content.ModsList
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            Input._currentString = Input._currentString.Replace("/", "");
+            Input._currentString = Input._currentString.Replace("¶", "");
+            if (Main.keyState.IsKeyUp(Microsoft.Xna.Framework.Input.Keys.Enter) && Main.oldKeyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Enter))
+                ApplyBG.LeftClick(null);
         }
         public void Popup(string origName, string Inputted, Func<string, bool> onRename = null)
         {
             resizing = false;
             Top.Pixels = 0;
-            Orig.text = origName;
-            Input.TextHint = Inputted;
-            Input._currentString = Inputted;
+            Orig.text = origName.Replace("¶", "/");
+            Input.TextHint = Inputted.Replace("¶", "/");
+            Input._currentString = Inputted.Replace("¶", "/");
             OnApplyCustom = onRename;
             Recalculate();
         }

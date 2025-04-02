@@ -20,7 +20,7 @@ using Terraria.UI;
 
 namespace ModManager.Content.ModsList
 {
-    public class UIModItemNew : UIPanel
+    public class UIModItemNew : UIPanelStyled
     {
         public LocalMod mod;
         public bool loaded;
@@ -37,7 +37,7 @@ namespace ModManager.Content.ModsList
 
         public UIImage toggle;
 
-        public UIPanel cantUse;
+        public UIPanelStyled cantUse;
         public UITextLines cantUseText;
 
         public bool CanDraw;
@@ -102,7 +102,7 @@ namespace ModManager.Content.ModsList
             Append(icon);
             textName = new()
             {
-                text = Name,
+                text = Name.Replace("¶", "/"),
                 Height = { Precent = 1 },
                 Top = { Pixels = 4 }
             };
@@ -289,7 +289,7 @@ namespace ModManager.Content.ModsList
                     text2 = $"{recommended} v{mod.tModLoaderVersion}";
                     color = Color.Yellow;
                 }
-                cantUse = new UIPanel()
+                cantUse = new UIPanelStyled()
                 {
                     Width = { Precent = 1 },
                     Height = { Precent = 1 },
@@ -341,7 +341,7 @@ namespace ModManager.Content.ModsList
             }
             base.Draw(spriteBatch);
         }
-        public void Set(bool? enabled = null)
+        public void Set(bool? enabled = null, bool check = true)
         {
             if (mod == null || cantUseText != null) return;
 
@@ -355,23 +355,38 @@ namespace ModManager.Content.ModsList
                     if (item.mod != null && l.Contains(item.mod.Name))
                     {
                         if (item.cantUseText != null) return;
-                        item.Set(true);
+                        item.Set(true, false);
                         l.Remove(item.mod.Name);
                     }
                 }
                 if (l.Count != 0)
                 {
+                    UIModsNew.Instance.AddCollections();
+                    UIModsNew.Instance.CheckChanged();
                     System.Windows.Forms.MessageBox.Show("Missing mods: " + string.Join(",", l), "Missing Mods", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     return;
                 }
             }
             else
             {
+                var need = new List<string>();
                 foreach (var item in UIModsNew.Instance.uIMods)
                 {
-                    if (item.mod != null && item.References.Contains(mod.Name))
+                    if (check && item.mod != null && item.References.Contains(mod.Name))
                     {
-                        item.Set(false);
+                        item.Set(false, false);
+                    }
+                    else if (item.mod != null && item.mod.Enabled && item != this)
+                    {
+                        need.AddRange(item.References);
+                    }
+                }
+                foreach (var item in UIModsNew.Instance.uIMods)
+                {
+                    if (item.mod != null && References.Contains(item.mod.Name) && !need.Contains(item.mod.Name))
+                    {
+                        Logging.PublicLogger.Info("Disabling " + item.mod.Name);
+                        item.Set(false, false);
                     }
                 }
             }
@@ -382,8 +397,11 @@ namespace ModManager.Content.ModsList
                 toggle._texture = mod.Enabled ? ModManager.AssetToggleOn : ModManager.AssetToggleOff;
                 toggle.Color = mod.Enabled != loaded ? Color.Gold : mod.Enabled ? new Color(0.75f, 1f, 0.75f) : Color.White;
             }
-            UIModsNew.Instance.AddCollections();
-            UIModsNew.Instance.CheckChanged();
+            if (check)
+            {
+                UIModsNew.Instance.AddCollections();
+                UIModsNew.Instance.CheckChanged();
+            }
         }
         public void Redesign()
         {
@@ -406,7 +424,7 @@ namespace ModManager.Content.ModsList
             {
                 if (DataConfig.Instance.ModNames.ContainsKey(mod.Name))
                     Name = DataConfig.Instance.ModNames[mod.Name];
-                textName.text = Name;
+                textName.text = Name.Replace("¶", "/");
                 if (grid)
                 {
                     textAuthor.Remove();
@@ -456,8 +474,6 @@ namespace ModManager.Content.ModsList
         {
             base.Update(gameTime);
 
-            var colors = ManagerConfigColors.Instance;
-
             if (timetograb > 0)
             {
                 timetograb -= (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -469,21 +485,21 @@ namespace ModManager.Content.ModsList
             }
             var t = UIModsNew.Instance.SelectedItems.Contains(this);
             IgnoresMouseInteraction = t && UIModsNew.Instance.GrabbedItem;
-            BackgroundColor = t ? colors.ColorBackgroundSelected : IsMouseHovering ? colors.ColorBackgroundHovered : colors.ColorBackgroundStatic;
-            BorderColor = t ? colors.ColorBorderHovered : colors.ColorBorderStatic;
+            BackgroundColor = t ? UIColors.ColorBackgroundSelected : IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
+            BorderColor = t ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
             if (needUpdate)
             {
-                BackgroundColor.R = (byte)(MathHelper.Lerp(BackgroundColor.R, colors.ColorNeedUpdate.R, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.R * colors.ColorNeedUpdate.A / 255f);
-                BackgroundColor.G = (byte)(MathHelper.Lerp(BackgroundColor.G, colors.ColorNeedUpdate.G, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.R * colors.ColorNeedUpdate.A / 255f);
-                BackgroundColor.B = (byte)(MathHelper.Lerp(BackgroundColor.B, colors.ColorNeedUpdate.B, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.R * colors.ColorNeedUpdate.A / 255f);
-                BackgroundColor.A = (byte)(MathHelper.Lerp(BackgroundColor.A, colors.ColorNeedUpdate.A, colors.ColorNeedUpdate.A / 255f) + colors.ColorNeedUpdate.A * colors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.R = (byte)(MathHelper.Lerp(BackgroundColor.R, UIColors.ColorNeedUpdate.R, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.R * UIColors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.G = (byte)(MathHelper.Lerp(BackgroundColor.G, UIColors.ColorNeedUpdate.G, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.R * UIColors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.B = (byte)(MathHelper.Lerp(BackgroundColor.B, UIColors.ColorNeedUpdate.B, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.R * UIColors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.A = (byte)(MathHelper.Lerp(BackgroundColor.A, UIColors.ColorNeedUpdate.A, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.A * UIColors.ColorNeedUpdate.A / 255f);
             }
             if (UIModsNew.Instance.GrabbedItem)
             {
                 if (mod == null && !t)
                 {
-                    BackgroundColor = IsMouseHovering ? colors.ColorBackgroundSelected : colors.ColorBackgroundHovered;
-                    BorderColor = IsMouseHovering ? colors.ColorBorderAllowDropHovered : colors.ColorBorderAllowDrop;
+                    BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundSelected : UIColors.ColorBackgroundHovered;
+                    BorderColor = IsMouseHovering ? UIColors.ColorBorderAllowDropHovered : UIColors.ColorBorderAllowDrop;
                     if (IsMouseHovering)
                     {
                         UIModsNew.Instance.GrabbedFolder = string.Join("/", UIModsNew.Instance.OpenedPath) + "/" + Name + "/";

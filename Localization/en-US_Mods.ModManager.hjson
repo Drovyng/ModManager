@@ -1,6 +1,6 @@
 Configs: {
 	DataConfig: {
-		DisplayName: Data Config
+		DisplayName: Data 1
 
 		RootSize: {
 			Label: Root Size
@@ -64,7 +64,7 @@ Configs: {
 	}
 
 	DataConfigBrowser: {
-		DisplayName: Data Config Browser
+		DisplayName: Data 2
 
 		RootSize: {
 			Label: Root Size
@@ -92,53 +92,25 @@ Configs: {
 		}
 	}
 
-	ManagerConfigColors: {
-		DisplayName: Color Scheme
 
-		ColorBorderStatic: {
-			Label: Border Static
+	ManagerConfig: {
+		DisplayName: Config
+
+		ModLoadingUpgrade: {
+			Label: Mod Loading Upgrade
 			Tooltip: ""
 		}
 
-		ColorBorderHovered: {
-			Label: Border Hovered
+		Theme: {
+			Label: Theme
 			Tooltip: ""
 		}
+	}
 
-		ColorBorderAllowDrop: {
-			Label: Border Allow Drop
-			Tooltip: ""
-		}
-
-		ColorBorderAllowDropHovered: {
-			Label: Border Allow Drop Hovered
-			Tooltip: ""
-		}
-
-		ColorBackgroundStatic: {
-			Label: Background Static
-			Tooltip: ""
-		}
-
-		ColorBackgroundHovered: {
-			Label: Background Hovered
-			Tooltip: ""
-		}
-
-		ColorBackgroundSelected: {
-			Label: Background Selected
-			Tooltip: ""
-		}
-
-		ColorBackgroundDisabled: {
-			Label: Color Background Disabled
-			Tooltip: ""
-		}
-
-		ColorNeedUpdate: {
-			Label: Color Need Update
-			Tooltip: ""
-		}
+	ManagerConfigTheme: {
+		Tooltip: ""
+		Blue.Label: Blue
+		Light.Label: Light
 	}
 }
 
@@ -172,7 +144,7 @@ NumberEnabled: Enabled
 ChangedEnabled: Enabled
 ChangedDisabled: Disabled
 ChangedConfigs: Configs
-UpdateCheckAnalysing: Analysing Mods…
+UpdateCheckAnalysing: Analysing Modsï¿½
 UpdateCheckZero: All Mods Are Updated!
 UpdateCheckNeed: "{0} Mods Need Update!"
 NeedUpdate: Need Update

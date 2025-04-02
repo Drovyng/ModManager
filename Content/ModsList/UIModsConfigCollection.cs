@@ -16,7 +16,7 @@ namespace ModManager.Content.ModsList
     public class UIModsConfigCollection : UIElement
     {
         public UITextDots<string> Text;
-        public UIPanel Panel;
+        public UIPanelStyled Panel;
         public UIImage Toggle;
         public bool isAll;
         public UIModsConfigCollection(string name)
@@ -58,11 +58,7 @@ namespace ModManager.Content.ModsList
         public static void Delete(string text)
         {
             string path = Path.Combine(ConfigManager.ModConfigPath, "Collection_" + text);
-            foreach (var item in Directory.EnumerateFiles(path))
-            {
-                File.Delete(item);
-            }
-            Directory.Delete(path);
+            Directory.Delete(path, true);
         }
         public static void SaveAll(string text)
         {
@@ -147,7 +143,7 @@ namespace ModManager.Content.ModsList
             {
                 UIModsNew.Instance.root.UseLeft = false;
             }
-            Panel.BackgroundColor = IsMouseHovering ? ManagerConfigColors.Instance.ColorBackgroundHovered : ManagerConfigColors.Instance.ColorBackgroundStatic;
+            Panel.BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
         }
         public override void LeftClick(UIMouseEvent evt)
         {

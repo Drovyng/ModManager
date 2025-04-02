@@ -10,7 +10,7 @@ using Terraria.UI;
 
 namespace ModManager.Content
 {
-    public class UIPanelSizeable : UIPanel
+    public class UIPanelSizeable : UIPanelStyled
     {
         public Action OnResizing;
 

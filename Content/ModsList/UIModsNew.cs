@@ -39,15 +39,15 @@ namespace ModManager.Content.ModsList
         public UIContentList rootVertical;
         public UIContentList rootHorizontal;
 
-        public UIPanel topPanel;
+        public UIPanelStyled topPanel;
         public UIPanelSizeable collections;
 
         public UIContentList mainVertical;
 
-        public UIPanel pathHorizontalOut;
+        public UIPanelStyled pathHorizontalOut;
         public UIContentList pathHorizontal;
 
-        public UIPanel searchFieldOut;
+        public UIPanelStyled searchFieldOut;
         public UIInputTextFieldPriority<LocalizedText> searchField;
 
         public UIList mainList;
@@ -62,7 +62,7 @@ namespace ModManager.Content.ModsList
         public UIContentList configCollecListIn;
         public UIScrollbar configCollecScrollbar;
 
-        public UIPanel categoriesHorizontalOut;
+        public UIPanelStyled categoriesHorizontalOut;
         public UIContentList categoriesHorizontal;
 
         public Task<List<UIModItemNew>> ReloadTask;
@@ -77,9 +77,9 @@ namespace ModManager.Content.ModsList
 
         public UIImage LoadingImage;
 
-        public UIPanel CantLeave;
+        public UIPanelStyled CantLeave;
 
-        public UIPanel BottomCounter;
+        public UIPanelStyled BottomCounter;
 
         public int ModsChangedEnable;
         public int ModsChangedDisable;
@@ -200,11 +200,11 @@ namespace ModManager.Content.ModsList
         }
         public override void OnInitialize()
         {
-            var colors = ManagerConfigColors.Instance;
-            
             buttonOMF = new(LocalizedText.Empty); // Prevents chashing on "Draw()" method
 
             Elements.Clear();
+
+            Append(new UIAlphaFixer());
 
             Append(new UIMMTopPanel());
 
@@ -221,8 +221,8 @@ namespace ModManager.Content.ModsList
                 centered = true,
                 MinHorizontal = 500,
                 MinVertical = 400,
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                BackgroundColor = UIColors.ColorBackgroundStatic,
+                BorderColor = UIColors.ColorBorderStatic
             };
             root.OnUpdate += (g) => { root.UseLeft = true; };
             root.OnResizing = RedesignUIMods;
@@ -241,8 +241,8 @@ namespace ModManager.Content.ModsList
             {
                 Width = { Precent = 1 },
                 Height = { Pixels = 100 },
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                BackgroundColor = UIColors.ColorBackgroundStatic,
+                BorderColor = UIColors.ColorBorderStatic
             };
             topPanel.SetPadding(8);
             rootVertical.Append(topPanel);
@@ -260,8 +260,8 @@ namespace ModManager.Content.ModsList
                 Height = { Precent = 1 },
                 UseRight = true,
                 MinHorizontal = 100,
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                BackgroundColor = UIColors.ColorBackgroundStatic,
+                BorderColor = UIColors.ColorBorderStatic
             };
             collections.OnResizing = RedesignUIMods;
             collections.SetPadding(0);
@@ -280,9 +280,7 @@ namespace ModManager.Content.ModsList
             pathHorizontalOut = new()
             {
                 Width = { Precent = 1 },
-                Height = { Pixels = 32 },
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                Height = { Pixels = 32 }
             };
             pathHorizontalOut.SetPadding(0);
             mainVertical.Append(pathHorizontalOut);
@@ -293,14 +291,14 @@ namespace ModManager.Content.ModsList
                 Height = { Precent = 1 },
                 OverflowHidden = true
             };
+            pathHorizontal.Append(new UIAlphaFixer());
             pathHorizontalOut.Append(pathHorizontal);
+            pathHorizontalOut.Append(new UIAlphaFixer());
 
             searchFieldOut = new()
             {
                 Width = { Precent = 1 },
-                Height = { Pixels = 32 },
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                Height = { Pixels = 32 }
             };
             searchFieldOut.SetPadding(0);
             searchField = new(ModManager.Get("SearchModsHint"), 0)
@@ -340,12 +338,12 @@ namespace ModManager.Content.ModsList
                 MarginRight = 12,
                 Top = { Pixels = 8 }
             }.WithView(100, 1000);
-            var elem231 = new UIPanel()
+            var elem231 = new UIPanelStyled()
             {
                 Width = { Precent = 1, Pixels = -30 },
                 Height = { Precent = 0.5f },
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                BackgroundColor = UIColors.ColorBackgroundStatic,
+                BorderColor = UIColors.ColorBorderStatic
             };
             elem231.SetPadding(0);
             collecList = new()
@@ -354,6 +352,7 @@ namespace ModManager.Content.ModsList
                 Height = { Precent = 1 },
                 OverflowHidden = true,
             };
+            collecList.Append(new UIAlphaFixer());
             collecListIn = new()
             {
                 Width = { Precent = 1 },
@@ -363,6 +362,7 @@ namespace ModManager.Content.ModsList
             collecList.Append(collecListIn);
             collections.Append(collecScrollbar);
             elem231.Append(collecList);
+            elem231.Append(new UIAlphaFixer());
             collections.Append(elem231);
             collecList.OnScrollWheel += (e, l) => { collecScrollbar.ViewPosition -= e.ScrollWheelValue; };
             collecListIn.OnUpdate += (e) => { collecListIn.Top.Pixels = -collecScrollbar.ViewPosition; };
@@ -376,13 +376,13 @@ namespace ModManager.Content.ModsList
                 MarginRight = 12,
                 Top = { Pixels = -8 }
             }.WithView(100, 1000);
-            var elem232 = new UIPanel()
+            var elem232 = new UIPanelStyled()
             {
                 Width = { Precent = 1, Pixels = -30 },
                 Height = { Precent = 0.5f },
                 VAlign = 1,
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                BackgroundColor = UIColors.ColorBackgroundStatic,
+                BorderColor = UIColors.ColorBorderStatic
             };
             elem232.SetPadding(0);
             configCollecList = new()
@@ -391,6 +391,7 @@ namespace ModManager.Content.ModsList
                 Height = { Precent = 1f },
                 OverflowHidden = true
             };
+            configCollecList.Append(new UIAlphaFixer());
             configCollecListIn = new()
             {
                 Width = { Precent = 1 },
@@ -400,6 +401,7 @@ namespace ModManager.Content.ModsList
             configCollecList.Append(configCollecListIn);
             collections.Append(configCollecScrollbar);
             elem232.Append(configCollecList);
+            elem232.Append(new UIAlphaFixer());
             collections.Append(elem232);
             configCollecList.OnScrollWheel += (e, l) => { collecScrollbar.ViewPosition -= e.ScrollWheelValue; };
             configCollecListIn.OnUpdate += (e) => { collecListIn.Top.Pixels = -collecScrollbar.ViewPosition; };
@@ -409,8 +411,8 @@ namespace ModManager.Content.ModsList
             {
                 Width = { Precent = 1, Pixels = -32 },
                 Height = { Pixels = 32 },
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                BackgroundColor = UIColors.ColorBackgroundStatic,
+                BorderColor = UIColors.ColorBorderStatic
             };
             categoriesHorizontalOut.SetPadding(0);
             mainVertical.Append(categoriesHorizontalOut);
@@ -421,7 +423,9 @@ namespace ModManager.Content.ModsList
                 Height = { Precent = 1 },
                 OverflowHidden = true
             };
+            categoriesHorizontal.Append(new UIAlphaFixer());
             categoriesHorizontalOut.Append(categoriesHorizontal);
+            categoriesHorizontalOut.Append(new UIAlphaFixer());
 
             mainScrollbar = new UIScrollbar()
             {
@@ -446,6 +450,7 @@ namespace ModManager.Content.ModsList
                 Height = { Precent = 1 },
                 OverflowHidden = true
             };
+            mainList.Append(new UIAlphaFixer());
             mainListIn = new()
             {
                 Width = { Precent = 1 },
@@ -469,15 +474,16 @@ namespace ModManager.Content.ModsList
                 };
                 elem.Append(mainScrollbar);
                 elem.Append(mainList);
+                elem.Append(new UIAlphaFixer());
                 elem.Append(LoadingImage);
                 mainVertical.Append(elem);
             }
-            BottomCounter = new UIPanel()
+            BottomCounter = new UIPanelStyled()
             {
                 Width = { Precent = 1 },
                 Height = { Pixels = 32 },
-                BackgroundColor = colors.ColorBackgroundStatic,
-                BorderColor = colors.ColorBorderStatic
+                BackgroundColor = UIColors.ColorBackgroundStatic,
+                BorderColor = UIColors.ColorBorderStatic
             };
             BottomCounter.SetPadding(0);
             BottomCounter.PaddingLeft = BottomCounter.PaddingRight = 24;
@@ -552,13 +558,11 @@ namespace ModManager.Content.ModsList
                 CheckChangedCallback += Recalc;
             }
             {
-                var ontopSettings = new UIPanel()
+                var ontopSettings = new UIPanelStyled()
                 {
                     Width = { Precent = 0.3f },
                     Height = { Precent = 1 },
-                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8,
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
+                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8
                 };
                 var labelScale = new UITextDots<string>()
                 {
@@ -632,14 +636,12 @@ namespace ModManager.Content.ModsList
                 topPanel.Append(ontopSettings);
             }
             {
-                var ontopInfo = new UIPanel()
+                var ontopInfo = new UIPanelStyled()
                 {
                     Width = { Precent = 0.3f },
                     Height = { Precent = 1 },
                     Left = { Precent = 0.7f },
-                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8,
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
+                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8
                 };
                 var icon = new UIImage(ModManager.AssetModIcon)
                 {
@@ -703,22 +705,18 @@ namespace ModManager.Content.ModsList
                 topPanel.Append(ontopInfo);
             }
             {
-                var ontopButtons = new UIPanel()
+                var ontopButtons = new UIPanelStyled()
                 {
                     Left = { Precent = 0.3f },
                     Width = { Precent = 0.4f },
-                    Height = { Precent = 1 },
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
+                    Height = { Precent = 1 }
                 };
                 ontopButtons.SetPadding(0);
-                var buttonConfig = new UIPanel()
+                var buttonConfig = new UIPanelStyled()
                 {
                     Width = { Precent = 0.4f },
-                    Height = { Precent = 1f / 3f },
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
-                }.WithFadedMouseOver(colors.ColorBackgroundHovered, colors.ColorBackgroundStatic, colors.ColorBorderHovered, colors.ColorBorderStatic);
+                    Height = { Precent = 1f / 3f }
+                }.FadedMouseOver();
                 buttonConfig.Append(new UITextDots<LocalizedText>()
                 {
                     text = ModManager.Get("ButtonConfig"),
@@ -738,14 +736,12 @@ namespace ModManager.Content.ModsList
                     Interface.modConfig.openedFromModder = true;
                 };
                 ontopButtons.Append(buttonConfig);
-                var buttonApply = new UIPanel()
+                var buttonApply = new UIPanelStyled()
                 {
                     Width = { Precent = 0.6f },
                     Height = { Precent = 1f / 3f },
-                    Left = { Precent = 0.4f },
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
-                }.WithFadedMouseOver(colors.ColorBackgroundHovered, colors.ColorBackgroundStatic, colors.ColorBorderHovered, colors.ColorBorderStatic);
+                    Left = { Precent = 0.4f }
+                }.FadedMouseOver();
                 buttonApply.Append(new UITextDots<LocalizedText>()
                 {
                     text = ModManager.Get("ButtonApplyChanges"),
@@ -772,15 +768,13 @@ namespace ModManager.Content.ModsList
                     ModManager.Get("ChangedConfigs").ToString() + ": " + ModsChangedConfig;
                 };
                 ontopButtons.Append(buttonApply);
-                var buttonReject = new UIPanel()
+                var buttonReject = new UIPanelStyled()
                 {
                     Width = { Precent = 0.6f },
                     Height = { Precent = 1f / 3f },
                     Left = { Precent = 0.4f },
-                    Top = { Precent = 1f / 3f },
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
-                }.WithFadedMouseOver(colors.ColorBackgroundHovered, colors.ColorBackgroundStatic, colors.ColorBorderHovered, colors.ColorBorderStatic);
+                    Top = { Precent = 1f / 3f }
+                }.FadedMouseOver();
                 buttonReject.Append(new UITextDots<LocalizedText>()
                 {
                     text = ModManager.Get("ButtonRejectChanges"),
@@ -798,14 +792,12 @@ namespace ModManager.Content.ModsList
                     ModManager.Get("ChangedConfigs").ToString() + ": " + ModsChangedConfig;
                 };
                 ontopButtons.Append(buttonReject);
-                var buttonInfo = new UIPanel()
+                var buttonInfo = new UIPanelStyled()
                 {
                     Width = { Precent = 0.4f },
                     Height = { Precent = 1f / 3f },
-                    Top = { Precent = 1f / 3f },
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
-                }.WithFadedMouseOver(colors.ColorBackgroundHovered, colors.ColorBackgroundStatic, colors.ColorBorderHovered, colors.ColorBorderStatic);
+                    Top = { Precent = 1f / 3f }
+                }.FadedMouseOver();
                 buttonInfo.Append(new UITextDots<LocalizedText>()
                 {
                     text = ModManager.Get("ButtonInfo"),
@@ -816,22 +808,20 @@ namespace ModManager.Content.ModsList
                 });
                 buttonInfo.OnLeftClick += (e, l) => ShowInfo();
                 buttonInfo.IgnoresMouseInteraction = SelectedItem == null || SelectedItem.mod == null;
-                buttonInfo.BackgroundColor = buttonInfo.IgnoresMouseInteraction ? colors.ColorBackgroundDisabled : colors.ColorBackgroundStatic;
+                buttonInfo.BackgroundColor = buttonInfo.IgnoresMouseInteraction ? UIColors.ColorBackgroundDisabled : UIColors.ColorBackgroundStatic;
                 ChangeSelection += () =>
                 {
                     buttonInfo.IgnoresMouseInteraction = SelectedItem == null || SelectedItem.mod == null;
-                    buttonInfo.BackgroundColor = buttonInfo.IgnoresMouseInteraction ? colors.ColorBackgroundDisabled : colors.ColorBackgroundStatic;
+                    buttonInfo.BackgroundColor = buttonInfo.IgnoresMouseInteraction ? UIColors.ColorBackgroundDisabled : UIColors.ColorBackgroundStatic;
                 };
                 ontopButtons.Append(buttonInfo);
 
-                var buttonEnableAll = new UIPanel()
+                var buttonEnableAll = new UIPanelStyled()
                 {
                     Width = { Precent = 0.5f },
                     Height = { Precent = 1f / 3f },
-                    Top = { Precent = 2f / 3f },
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
-                }.WithFadedMouseOver(colors.ColorBackgroundHovered, colors.ColorBackgroundStatic, colors.ColorBorderHovered, colors.ColorBorderStatic);
+                    Top = { Precent = 2f / 3f }
+                }.FadedMouseOver();
                 buttonEnableAll.Append(new UITextDots<LocalizedText>()
                 {
                     text = Language.GetText("tModLoader.ModsEnableAll"),
@@ -848,15 +838,13 @@ namespace ModManager.Content.ModsList
                     }
                 };
                 ontopButtons.Append(buttonEnableAll);
-                var buttonDisableAll = new UIPanel()
+                var buttonDisableAll = new UIPanelStyled()
                 {
                     Width = { Precent = 0.5f },
                     Left = { Precent = 0.5f },
                     Height = { Precent = 1f / 3f },
-                    Top = { Precent = 2f / 3f },
-                    BackgroundColor = colors.ColorBackgroundStatic,
-                    BorderColor = colors.ColorBorderStatic
-                }.WithFadedMouseOver(colors.ColorBackgroundHovered, colors.ColorBackgroundStatic, colors.ColorBorderHovered, colors.ColorBorderStatic);
+                    Top = { Precent = 2f / 3f }
+                }.FadedMouseOver();
                 buttonDisableAll.Append(new UITextDots<LocalizedText>()
                 {
                     text = Language.GetText("tModLoader.ModsDisableAll"),
@@ -879,7 +867,7 @@ namespace ModManager.Content.ModsList
                 CheckChangedCallback += () =>
                 {
                     var c = !DoNotClose;
-                    var col = c ? colors.ColorBackgroundDisabled : colors.ColorBackgroundStatic;
+                    var col = c ? UIColors.ColorBackgroundDisabled : UIColors.ColorBackgroundStatic;
                     buttonApply.IgnoresMouseInteraction = c;
                     buttonApply.BackgroundColor = col;
                     buttonReject.IgnoresMouseInteraction = c;
@@ -945,29 +933,13 @@ namespace ModManager.Content.ModsList
                 Tooltip = null;
             }
         }
-        private static double StringCompare(string a, string b)
-        {
-            if (a == b) return 100;
-            if (a.Length == 0 || b.Length == 0) return 0;
-            double maxLen = a.Length > b.Length ? a.Length : b.Length;
-            int minLen = a.Length < b.Length ? a.Length : b.Length;
-            int sameCharAtIndex = 0;
-            for (int i = 0; i < minLen; i++)
-            {
-                if (a[i] == b[i])
-                {
-                    sameCharAtIndex++;
-                }
-            }
-            return sameCharAtIndex / maxLen * 100;
-        }
         public bool IsModFiltered(UIModItemNew item)
         {
             var s = searchField._currentString.ToLower();
             if (s.Length == 0 || item.mod == null) return true;
-            var n1 = item.Name.ToLower();
+            var n1 = item.Name.ToLower().Replace("¶", "/");
             var n2 = item.mod.DisplayNameClean.ToLower();
-            return n1.StartsWith(s) || n2.StartsWith(s) || item.mod.properties.author.ToLower().StartsWith(s) || StringCompare(n1, s) >= 35 || StringCompare(n2, s) >= 35 || StringCompare(item.mod.properties.author.ToLower(), s) >= 25;
+            return n1.Contains(s) || n2.Contains(s) || item.mod.properties.author.ToLower().Contains(s);
         }
         public void UpdateDisplayed()
         {
@@ -1040,7 +1012,7 @@ namespace ModManager.Content.ModsList
                 var j = k;
                 path += item + "/";
                 var p = path;
-                var i = new UIModsPathPart(item + "/", p);
+                var i = new UIModsPathPart(item.Replace("¶", "/") + "/", p);
                 i.OnLeftClick += (m, l) =>
                 {
                     if (OpenedCollections)
@@ -1112,10 +1084,10 @@ namespace ModManager.Content.ModsList
                 mod.Top.Pixels = pos.Y;
                 if (!grid) pos.Y += mod.GetOuterDimensions().Height;
             }
-            pos.Y = MathF.Max(pos.Y, mainList.GetInnerDimensions().Height);
+            pos.Y = MathF.Max(pos.Y, c.Height);
             mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();
-            mainScrollbar.SetView(mainList.GetInnerDimensions().Height, pos.Y);
+            mainScrollbar.SetView(c.Height, pos.Y);
         }
         public void CheckChanged()
         {
@@ -1160,7 +1132,7 @@ namespace ModManager.Content.ModsList
             configCollecListIn.Elements.Clear();
 
             configCollecListIn.Append(new UIModsConfigCollection("Your Config") { isAll = true });
-            (configCollecListIn.Elements[0] as UIModsConfigCollection).Panel.WithFadedMouseOver();
+            (configCollecListIn.Elements[0] as UIModsConfigCollection).Panel.FadedMouseOver();
             (configCollecListIn.Elements[0] as UIModsConfigCollection).Text.align = 0.5f;
 
             foreach (var item in DataConfig.Instance.ConfigCollections)

@@ -92,53 +92,26 @@ Configs: {
 		}
 	}
 
-	ManagerConfigColors: {
-		DisplayName: Цветовая Схема
 
-		ColorBorderStatic: {
-			// Label: Border Static
-			// Tooltip: ""
+	ManagerConfig: {
+		DisplayName: Конфиг
+		
+
+		ModLoadingUpgrade: {
+			Label: Апгрейд Загрузки Модов
+			Tooltip: ""
 		}
 
-		ColorBorderHovered: {
-			// Label: Border Hovered
+		Theme: {
+			Label: Тема
 			// Tooltip: ""
 		}
+	}
 
-		ColorBorderAllowDrop: {
-			// Label: Border Allow Drop
-			// Tooltip: ""
-		}
-
-		ColorBorderAllowDropHovered: {
-			// Label: Border Allow Drop Hovered
-			// Tooltip: ""
-		}
-
-		ColorBackgroundStatic: {
-			// Label: Background Static
-			// Tooltip: ""
-		}
-
-		ColorBackgroundHovered: {
-			// Label: Background Hovered
-			// Tooltip: ""
-		}
-
-		ColorBackgroundSelected: {
-			// Label: Background Selected
-			// Tooltip: ""
-		}
-
-		ColorBackgroundDisabled: {
-			// Label: Color Background Disabled
-			// Tooltip: ""
-		}
-
-		ColorNeedUpdate: {
-			// Label: Color Need Update
-			// Tooltip: ""
-		}
+	ManagerConfigTheme: {
+		// Tooltip: ""
+		Blue.Label: Синяя
+		Light.Label: Светлая
 	}
 }
 
