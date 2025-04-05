@@ -55,12 +55,15 @@ namespace ModManager.Content.ModsList
             if (uIMod != null)
             {
                 if (!UIModsNew.Instance.SelectedItems.Contains(uIMod))
+                {
+                    UIModsNew.Instance.SelectedItems.Clear();
                     UIModsNew.Instance.SelectedItems.Add(uIMod);
-                UIModsNew.Instance.ChangeSelection();
+                    UIModsNew.Instance.ChangeSelection();
+                }
                 if (uIMod.mod == null)
                 {
                     AddAction("CreateFolder");
-                    AddAction("Rename");
+                    AddAction("Rename", UIModsNew.Instance.SelectedItem == null);
                     AddAction("Delete", UIModsNew.Instance.SelectedItem == null);
                 }
                 else
@@ -79,10 +82,8 @@ namespace ModManager.Content.ModsList
                     }
                     else
                     {
-                        AddAction("Info", true);
                         AddAction("Enable");
                         AddAction("Disable");
-                        AddAction("Rename", true);
                         if (UIModsNew.Instance.OpenedCollections) AddAction("Remove");
                     }
                 }
@@ -158,11 +159,13 @@ namespace ModManager.Content.ModsList
                             cfg.Folders.Add(name);
                             cfg.Save();
                             UIModsNew.Instance.UpdateDisplayed();
+                            /*
                             UIModsNew.Instance.SelectedItems.Clear();
-                            UIModsNew.Instance.SelectedItems.Add(UIModsNew.Instance.mainListIn.Elements.Find((el) => (el as UIModItemNew).mod == null && (el as UIModItemNew).Name == name) as UIModItemNew);
+                            UIModsNew.Instance.SelectedItems.Add(UIModsNew.Instance.uIMods.Find((el) => el.Active && el.mod == null && el.Name == name));
                             UIModsNew.Instance.popupRename.OnApplyCustom = null;
                             UIModsNew.Instance.popupRename.Popup(name.Substring(path.Length), name.Substring(path.Length));
                             UIModsNew.Instance.popupRename.Input._currentString = "";
+                            */
                             return;
                         }
                         i++;
@@ -345,7 +348,7 @@ namespace ModManager.Content.ModsList
             }
         }
     }
-    public class UIModsContextMenuAction : UIPanel
+    public class UIModsContextMenuAction : UIPanelStyled
     {
         public bool inactive;
         public string Name;

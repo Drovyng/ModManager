@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.ModLoader.UI.ModBrowser;
+using Terraria.Social.Base;
 using Terraria.Social.Steam;
 
 namespace ModManager.Content
@@ -13,7 +14,7 @@ namespace ModManager.Content
     public static class WorkshopHelpMePlease
     {
         public static Task FindingModUpdatesTask;
-        public static List<string> ModsRequireUpdates = new();
+        public static List<(string, ModPubId_t)> ModsRequireUpdates = new();
         public static bool ModsRequireUpdatesLoading = true;
         public static Action OnCheckedUpdates;
         public static void FindHasModUpdates()
@@ -25,7 +26,7 @@ namespace ModManager.Content
                 FindModUpdatesTask(ref ModsRequireUpdates, ref ModsRequireUpdatesLoading, ref OnCheckedUpdates, ref FindingModUpdatesTask);
             });
         }
-        private static void FindModUpdatesTask(ref List<string> modsNeedUpdate, ref bool modsNeedUpdateLoading, ref Action onYep, ref Task myTask)
+        private static void FindModUpdatesTask(ref List<(string, ModPubId_t)> modsNeedUpdate, ref bool modsNeedUpdateLoading, ref Action onYep, ref Task myTask)
         {
             modsNeedUpdateLoading = true;
             modsNeedUpdate.Clear();
@@ -36,7 +37,7 @@ namespace ModManager.Content
                 foreach (ModDownloadItem item in installedModDownloadItems)
                 {
                     item.UpdateInstallState();
-                    if (item.NeedUpdate) modsNeedUpdate.Add(item.ModName);
+                    if (item.NeedUpdate) modsNeedUpdate.Add((item.ModName, item.PublishId));
                 }
             }
             catch (Exception e)

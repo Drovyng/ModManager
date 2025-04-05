@@ -92,7 +92,6 @@ Configs: {
 		}
 	}
 
-
 	ManagerConfig: {
 		DisplayName: Config
 
@@ -148,3 +147,20 @@ UpdateCheckAnalysing: Analysing Mods�
 UpdateCheckZero: All Mods Are Updated!
 UpdateCheckNeed: "{0} Mods Need Update!"
 NeedUpdate: Need Update
+S_Scale: Scale
+S_TextScale: Text
+S_Threshold: Grid Threshold
+Cat_Name: Name
+Cat_Author: Author
+Cat_Version: Version
+Cat_Flags: Flags
+Cat_Date: Date
+SF_EveryMod: Everything
+SF_MyMods: My Mods
+SF_Custom: Custom
+BF_Sort: Sort
+BF_Period: Period
+BF_Update: Update
+BF_Search: Search
+BF_Side: Side
+BF_Language: Language

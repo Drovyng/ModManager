@@ -1,41 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ModManager.Content.ModsBrowser;
-using ModManager.Content.ModsList;
-using ReLogic.Content;
+using Terraria.Audio;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.Localization;
-using Terraria.ModLoader;
+using Terraria.ID;
 using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.ModLoader.UI.ModBrowser;
 using Terraria.UI;
+using Terraria.Localization;
 
 namespace ModManager.Content.ModsBrowser
 {
-    public class UIModBrowserItemNew : UIPanel
+    public class UIModBrowserItemNew : UIPanelStyled
     {
         public ModDownloadItem mod;
-        public bool loaded;
 
         public UIImage icon;
         public UITextDots<string> textName;
         public UITextDots<string> textAuthor;
         public UITextDots<string> textTime;
-        //public UIElement flagsMarkers;
+        public UIElement flagsMarkers;
 
         public UIImage divider1;
         public UIImage divider2;
-        //public UIImage divider3;
+        public UIImage divider3;
 
-        public bool Active;
         public string Name;
+        public bool loadedIcon;
 
         public UIModBrowserItemNew(ModDownloadItem _mod)
         {
@@ -64,7 +57,7 @@ namespace ModManager.Content.ModsBrowser
                 Top = { Pixels = 4 }
             };
             Append(textName);
-            /*
+
             flagsMarkers = new()
             {
                 Width = { Pixels = 200f },
@@ -72,7 +65,7 @@ namespace ModManager.Content.ModsBrowser
                 HAlign = 1
             };
             Append(flagsMarkers);
-            */
+
             textAuthor = new()
             {
                 text = mod.Author,
@@ -82,7 +75,7 @@ namespace ModManager.Content.ModsBrowser
             Append(textAuthor);
             textTime = new()
             {
-                text = "v" + TimeHelper.HumanTimeSpanString(mod.TimeStamp),
+                text = TimeHelper.HumanTimeSpanString(mod.TimeStamp),
                 Height = { Precent = 1 },
                 Top = { Pixels = 4 }
             };
@@ -105,7 +98,7 @@ namespace ModManager.Content.ModsBrowser
                 ScaleToFit = true
             };
             Append(divider2);
-            /*
+
             divider3 = new(TextureAssets.MagicPixel)
             {
                 OverrideSamplerState = SamplerState.PointClamp,
@@ -116,38 +109,72 @@ namespace ModManager.Content.ModsBrowser
             };
             Append(divider3);
 
-            var tags = new List<(Texture2D, string)>();
-
-            //if (mod)
-
-            float offset = 8;
-            foreach (var item in tags)
+            flagsMarkers = new()
             {
-                var img = new UIImage(item.Item1)
+                Width = { Pixels = 80 },
+                Height = { Pixels = 32 },
+                HAlign = 1
+            };
+
+            float off = -24;
+
+            if (!mod.IsInstalled || mod.NeedUpdate)
+            {
+                var img1 = new UIImage(string.IsNullOrEmpty(mod.ModReferencesBySlug) ? UICommon.ButtonDownloadTexture : UICommon.ButtonDownloadMultipleTexture)
                 {
-                    NormalizedOrigin = Vector2.One * 0.5f,
+                    HAlign = 1,
                     VAlign = 0.5f,
-                    HAlign = 1f,
-                    Left = { Pixels = -offset },
-                    Width = { Pixels = 22 },
-                    Height = { Pixels = 22 },
+                    Left = { Pixels = off },
+                    ScaleToFit = true,
+                    Width = { Pixels = 28 },
+                    Height = { Pixels = 28 },
+                    OverrideSamplerState = SamplerState.PointClamp
                 };
-                flagsMarkers.Append(img);
-                offset += 24;
+                img1.OnLeftClick += DownloadWithDeps;
+                flagsMarkers.Append(img1);
+                off -= 30;
             }
-            */
+            var img = new UIImage(UICommon.ButtonModInfoTexture)
+            {
+                HAlign = 1,
+                VAlign = 0.5f,
+                Left = { Pixels = off },
+                ScaleToFit = true,
+                Width = { Pixels = 28 },
+                Height = { Pixels = 28 },
+                OverrideSamplerState = SamplerState.PointClamp
+            };
+            img.OnLeftClick += ViewModInfo;
+            flagsMarkers.Append(img);
+            off -= 30;
+
+            flagsMarkers.Width.Pixels = -off;
+
             Redesign();
+        }
+        public async void DownloadWithDeps(UIMouseEvent evt, UIElement listeningElement)
+        {
+            SoundEngine.PlaySound(in SoundID.MenuTick);
+            if (await Interface.modBrowser.DownloadMods([mod]))
+            {
+                Main.QueueMainThreadAction(delegate { Main.menuMode = 10007; });
+            }
+        }
+        public void ViewModInfo(UIMouseEvent evt, UIElement listeningElement)
+        {
+            SoundEngine.PlaySound(in SoundID.MenuOpen);
+            Utils.OpenToURL(Interface.modBrowser.SocialBackend.GetModWebPage(mod.PublishId));
         }
         public void Redesign()
         {
             float scale = UIModBrowserNew.Instance.scale;
             float scaleText = UIModBrowserNew.Instance.scaleText;
             bool grid = scale >= UIModBrowserNew.Instance.scaleThreshold;
-            var e = UIModsNew.Instance.categoriesHorizontal.Elements;
+            var e = UIModBrowserNew.Instance.categoriesHorizontal.Elements;
 
             icon.Height = icon.Width = new(32 * scale - 6, 0);
-            icon.Left.Pixels = grid ? 10 : 20;
-            textName.Left.Pixels = grid ? 4 : 20 + 32 * scale;
+            icon.Left.Pixels = 10;
+            textName.Left.Pixels = grid ? 4 : 10 + 32 * scale;
             textName.Top.Pixels = grid ? 32 * scale + 9 + 5 * scaleText : 4;
             textName.Width = grid ? new(-8, 1) : new(e[0].GetOuterDimensions().Width - textName.Left.Pixels, 0);
             textName.Height = grid ? new(14 * scaleText, 0) : new(0, 1);
@@ -156,24 +183,38 @@ namespace ModManager.Content.ModsBrowser
 
             textName.text = Name;
 
+            flagsMarkers.VAlign = grid ? 0 : 0.5f;
+
+            var s = grid ? scale * 0.275f : scale * 0.8f;
+            int u = (grid ? 0 : -10);
+            foreach (var item in flagsMarkers.Elements)
+            {
+                item.Width.Pixels = 28 * s;
+                item.Height.Pixels = 28 * s;
+                item.Left.Pixels = u * s;
+                u -= grid ? 28 : 30;
+            }
+            flagsMarkers.Height.Pixels = 32 * s;
+            flagsMarkers.Width.Pixels = (-u + 12 + (grid ? 12 : 2)) * s;
+
+            flagsMarkers.Remove();
             if (grid)
             {
                 textAuthor.Remove();
                 textTime.Remove();
-                //flagsMarkers.Remove();
                 divider1.Remove();
                 divider2.Remove();
-                //divider3.Remove();
+                divider3.Remove();
             }
             else
             {
                 Append(textAuthor);
                 Append(textTime);
-                //Append(flagsMarkers);
                 Append(divider1);
                 Append(divider2);
-                //Append(divider3);
+                Append(divider3);
             }
+            Append(flagsMarkers);
 
             textAuthor.Left.Pixels = textName.Left.Pixels + textName.Width.Pixels + 6;
             textAuthor.Width.Pixels = e[1].GetOuterDimensions().Width - 6;
@@ -184,7 +225,7 @@ namespace ModManager.Content.ModsBrowser
             textTime.Width.Pixels = e[2].GetOuterDimensions().Width - 6;
             textTime.scale = scaleText;
             divider2.Left.Pixels = textTime.Left.Pixels - 8;
-            //divider3.Left.Pixels = divider2.Left.Pixels + textTime.Width.Pixels + 8;
+            divider3.Left.Pixels = divider2.Left.Pixels + textTime.Width.Pixels + 8;
 
             icon.Top.Pixels = grid ? 10 : 3;
 
@@ -198,52 +239,37 @@ namespace ModManager.Content.ModsBrowser
         {
             base.Update(gameTime);
 
-            BackgroundColor = IsMouseHovering ? new Color(93, 102, 171) * 0.7f : new Color(63, 82, 151) * 0.7f;
-            BorderColor = UIModBrowserNew.Instance.Selected == this ? Color.Gold : Color.Black;
+            BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
+            BorderColor = UIModBrowserNew.Instance.Selected == this ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
+
+            if (mod.NeedUpdate)
+            {
+                BackgroundColor.R = (byte)(MathHelper.Lerp(BackgroundColor.R, UIColors.ColorNeedUpdate.R, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.R * UIColors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.G = (byte)(MathHelper.Lerp(BackgroundColor.G, UIColors.ColorNeedUpdate.G, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.R * UIColors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.B = (byte)(MathHelper.Lerp(BackgroundColor.B, UIColors.ColorNeedUpdate.B, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.R * UIColors.ColorNeedUpdate.A / 255f);
+                BackgroundColor.A = (byte)(MathHelper.Lerp(BackgroundColor.A, UIColors.ColorNeedUpdate.A, UIColors.ColorNeedUpdate.A / 255f) + UIColors.ColorNeedUpdate.A * UIColors.ColorNeedUpdate.A / 255f);
+            }
+
+            if (IsMouseHovering && mod.NeedUpdate) UIModBrowserNew.Instance.Tooltip = Language.GetTextValue("Mods.ModManager.NeedUpdate");
+
+            if (!loadedIcon)
+            {
+                loadedIcon = true;
+                if (!string.IsNullOrEmpty(mod.ModIconUrl)) RequestModIcon();
+            }
         }
 
         public async void RequestModIcon()
         {
             if (UIModDownloadItem.ModIconDownloadFailCount < UIModDownloadItem.MaxFails)
             {
-                ModIconStatus = ModIconStatus.REQUESTED;
-                Texture2D texture2D = await UIModDownloadItem.GetOrDownloadTextureAsync(mod.ModIconUrl);
+                Texture2D? texture2D = await UIModDownloadItem.GetOrDownloadTextureAsync(mod.ModIconUrl);
                 if (texture2D != null)
                 {
                     icon._nonReloadingTexture = texture2D;
                     icon._texture = null;
                 }
             }
-
-            ModIconStatus = ModIconStatus.READY;
         }
-        public ModIconStatus ModIconStatus;
-        /*public int Sort(UIModItemNew other, int FilterCategory, int FilterTypo)
-        {
-            var mul = FilterTypo == 1 ? -1 : 1;
-            if (mod == null && other.mod == null)
-            {
-                return Name.CompareTo(other.Name) * (FilterCategory > 1 ? mul : 1);
-            }
-            if (other.mod == null) return 1;
-            if (mod == null) return -1;
-            if (FilterCategory == 1)
-            {
-                return Name.CompareTo(other.Name) * mul;
-            }
-            if (FilterCategory == 2)
-            {
-                return mod.properties.author.CompareTo(other.mod.properties.author) * mul;
-            }
-            if (FilterCategory == 3)
-            {
-                return mod.properties.version.CompareTo(other.mod.properties.version) * mul;
-            }
-            if (FilterCategory == 4)
-            {
-                return mod.properties.side.ToFriendlyString().CompareTo(other.mod.properties.side.ToFriendlyString()) * mul;
-            }
-            return 0;
-        }*/
     }
 }

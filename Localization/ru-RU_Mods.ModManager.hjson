@@ -1,6 +1,6 @@
 Configs: {
 	DataConfig: {
-		// DisplayName: Data Config
+		// DisplayName: Data 1
 
 		RootSize: {
 			// Label: Root Size
@@ -64,7 +64,7 @@ Configs: {
 	}
 
 	DataConfigBrowser: {
-		// DisplayName: Data Config Browser
+		// DisplayName: Data 2
 
 		RootSize: {
 			// Label: Root Size
@@ -92,10 +92,8 @@ Configs: {
 		}
 	}
 
-
 	ManagerConfig: {
 		DisplayName: Конфиг
-		
 
 		ModLoadingUpgrade: {
 			Label: Апгрейд Загрузки Модов
@@ -149,3 +147,20 @@ UpdateCheckAnalysing: Анализирование Модов…
 UpdateCheckZero: Все Моды Обновлены!
 UpdateCheckNeed: "{0} Модов Не Обновлены!"
 NeedUpdate: Требует Обновление
+S_Scale: Масштаб
+S_TextScale: Текст Масштаб
+S_Threshold: Порог Сетки
+Cat_Name: Название
+Cat_Author: Автор
+Cat_Version: Версия
+Cat_Flags: Флаги
+Cat_Date: Дата
+SF_EveryMod: Все Моды
+SF_MyMods: Мои Моды
+SF_Custom: Кастомный
+BF_Sort: Сортировать
+BF_Period: Период
+BF_Update: Обновление
+BF_Search: Искать
+BF_Side: Сторона
+BF_Language: Язык

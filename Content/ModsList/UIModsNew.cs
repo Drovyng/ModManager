@@ -13,7 +13,6 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
-using Terraria.ModLoader.Config.UI;
 using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -51,7 +50,7 @@ namespace ModManager.Content.ModsList
         public UIInputTextFieldPriority<LocalizedText> searchField;
 
         public UIList mainList;
-        public UIElement mainListIn;
+        public UIDoNotDrawNonArea mainListIn;
         public UIScrollbar mainScrollbar;
 
         public UIList collecList;
@@ -210,8 +209,8 @@ namespace ModManager.Content.ModsList
 
             root = new UIPanelSizeable()
             {
-                Width = { Pixels = DataConfig.Instance.RootSize[0] },
-                Height = { Pixels = DataConfig.Instance.RootSize[1] },
+                Width = { Pixels = MathF.Max(DataConfig.Instance.RootSize[0], 500) },
+                Height = { Pixels = MathF.Max(DataConfig.Instance.RootSize[1], 400) },
                 UseLeft = true,
                 UseRight = true,
                 UseUp = true,
@@ -240,9 +239,7 @@ namespace ModManager.Content.ModsList
             topPanel = new()
             {
                 Width = { Precent = 1 },
-                Height = { Pixels = 100 },
-                BackgroundColor = UIColors.ColorBackgroundStatic,
-                BorderColor = UIColors.ColorBorderStatic
+                Height = { Pixels = 100 }
             };
             topPanel.SetPadding(8);
             rootVertical.Append(topPanel);
@@ -457,8 +454,8 @@ namespace ModManager.Content.ModsList
                 Height = { Precent = 1 }
             };
             mainList.Append(mainListIn);
-            mainList.OnScrollWheel += (e, l) => { mainScrollbar.ViewPosition -= e.ScrollWheelValue; };
-            mainListIn.OnUpdate += (e) => { mainListIn.Top.Pixels = -mainScrollbar.ViewPosition; };
+            mainList.OnScrollWheel += (e, _) => { mainScrollbar.ViewPosition -= e.ScrollWheelValue; };
+            mainListIn.OnUpdate += (_) => { mainListIn.Top.Pixels = -mainScrollbar.ViewPosition; };
             {
                 var elem = new UIElement()
                 {
@@ -523,7 +520,7 @@ namespace ModManager.Content.ModsList
                 {
                     if (!WorkshopHelpMePlease.ModsRequireUpdatesLoading && numUpdateStatus._dimensions.ToRectangle().Contains(Main.mouseX, Main.mouseY) && WorkshopHelpMePlease.ModsRequireUpdates.Count != 0)
                     {
-                        Tooltip = string.Join("\n", WorkshopHelpMePlease.ModsRequireUpdates);
+                        Tooltip = string.Join("\n", WorkshopHelpMePlease.ModsRequireUpdates.Select(i => i.Item1));
                     }
                 };
                 BottomCounter.Append(numUpdateStatus);
@@ -969,7 +966,7 @@ namespace ModManager.Content.ModsList
             {
                 if (folder.StartsWith(path) && !folder.Substring(path.Length).Contains("/"))
                 {
-                    list.Insert(0, new UIModItemNew(null) { Name = folder.Substring(path.Length) });
+                    list.Insert(0, new UIModItemNew(null) { Name = folder.Substring(path.Length), Path = path });
                 }
             }
             list.Sort((left, right) => { return left.Sort(right, FilterCategory, FilterCategoryType); });

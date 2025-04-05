@@ -149,7 +149,7 @@ namespace ModManager.Content.ModsList
         {
             base.Update(gameTime);
             Input._currentString = Input._currentString.Replace("¶", "");
-            if (Main.keyState.IsKeyUp(Microsoft.Xna.Framework.Input.Keys.Enter) && Main.oldKeyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Enter))
+            if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Enter))
                 ApplyBG.LeftClick(null);
         }
         public void Popup(string origName, string Inputted, Func<string, bool> onRename = null)

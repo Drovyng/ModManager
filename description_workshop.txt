@@ -24,11 +24,8 @@ This mod is intended to improve the experience of interacting with the tModLoade
 [hr]
 [h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀PLANS[/h1]
 [olist]
-[*] Fully Complete [b]MODS LIST UPGRADE[/b]
-[*] Rework [b]MODS BROWSER[/b]
+[*] PUBLISH [b]BETA VERSION[/b]
 [*] Rework [b]EVERY WORKSHOP MENU [i](almost)[/i][/b]
 [*] Add Other Mods Compatibility
 [*] etc...
 [/olist]
-[quote=tModLoader ModManager]
-Developed By Drovyng[/quote]

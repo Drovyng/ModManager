@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Terraria.Localization;
 using Terraria.UI;
 
 namespace ModManager.Content.ModsList
 {
     public class UIModsTableCategory : UIPanelSizeable
     {
-        public UITextDots<string> Text;
+        public UITextDots<LocalizedText> Text;
         public UITextDots<string> Filter;
         public int id;
         public bool started;
@@ -21,7 +22,7 @@ namespace ModManager.Content.ModsList
                 Left = { Pixels = 6 },
                 Top = { Pixels = 4 },
                 align = 0.5f,
-                text = text,
+                text = string.IsNullOrEmpty(text) ? LocalizedText.Empty : ModManager.Get("Cat_" + text),
             };
             Filter = new()
             {

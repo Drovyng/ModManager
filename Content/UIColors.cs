@@ -51,7 +51,7 @@ namespace ModManager.Content
             ColorBorderAllowDrop = new Color(0, 255, 0) * 0.75f;
             ColorBorderAllowDropHovered = new Color(255, 255, 220) * 0.75f;
 
-            ColorBackgroundDisabled = new Color(64, 64, 64) * 0.175f;
+            ColorBackgroundDisabled = new Color(128, 64, 128) * 0.175f;
             ColorBackgroundStatic = new Color(128, 128, 128) * 0.175f;
             ColorBackgroundHovered = new Color(192, 192, 192) * 0.175f;
             ColorBackgroundSelected = new Color(255, 255, 255) * 0.2f;

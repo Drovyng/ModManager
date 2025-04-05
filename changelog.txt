@@ -1,8 +1,1 @@
-Replaces Color Scremes by themes
-Fixed bugs
-Changed Context Menu
-Changed Style
-Added Mods Loading Logs (Also See Config)
-Press Enter To Confirm Renaming
-Fixed Searching
-Fixed Folders Namings
+Fully reworked Mods Browser

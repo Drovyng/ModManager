@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Steamworks;
 using Terraria;
-using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
 namespace ModManager.Content

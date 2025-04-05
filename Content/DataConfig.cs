@@ -10,6 +10,7 @@ namespace ModManager.Content
         public static DataConfig Instance => ModContent.GetInstance<DataConfig>();
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
+        [Range(400, 5000)]
         public int[] RootSize = [840, 650];
         [DefaultValue(150)]
         public int CollectionsSize = 150;

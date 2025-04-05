@@ -44,6 +44,7 @@ namespace ModManager.Content.ModsList
 
         public bool Active;
         public string Name;
+        public string Path;
 
         public float timetograb;
         public bool needUpdate;
@@ -123,7 +124,7 @@ namespace ModManager.Content.ModsList
                     Top = { Pixels = 4 }
                 };
                 Append(textAuthor);
-                needUpdate = WorkshopHelpMePlease.ModsRequireUpdates.Contains(mod.Name);
+                needUpdate = WorkshopHelpMePlease.ModsRequireUpdates.Any(l => l.Item1 == mod.Name);
                 textVersion = new()
                 {
                     text = "v" + mod.properties.version.ToString() + (needUpdate ? " (" + Language.GetTextValue("Mods.ModManager.NeedUpdate") + ")" : ""),

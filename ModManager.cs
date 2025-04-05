@@ -14,6 +14,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
+using Terraria.ModLoader.UI.ModBrowser;
 
 namespace ModManager
 {
@@ -82,8 +83,7 @@ namespace ModManager
             UIColors.SetConfig();
 
             Interface.modsMenu = new UIModsNew();
-            //Interface.modBrowser = new UIModBrowserNew(Interface.modBrowser.SocialBackend);
-            Interface.modBrowser.Append(new UIMMTopPanel());
+            Interface.modBrowser = new UIModBrowserNew(Interface.modBrowser.SocialBackend);
             Interface.modPacksMenu.Append(new UIMMTopPanel());
             Interface.modSources.Append(new UIMMTopPanel());
 
@@ -168,6 +168,9 @@ namespace ModManager
         public override void Unload()
         {
             Interface.modsMenu = new UIMods();
+            Interface.modBrowser = new UIModBrowser(Interface.modBrowser.SocialBackend);
+            Interface.modPacksMenu = new UIModPacks();
+            Interface.modSources = new UIModSources();
         }
 
         private Vector2 Main_DrawThickCursor(On_Main.orig_DrawThickCursor orig, bool smart)
