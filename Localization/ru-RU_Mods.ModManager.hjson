@@ -111,6 +111,35 @@ Configs: {
 		Blue.Label: Синяя
 		Light.Label: Светлая
 	}
+
+	DataConfigResourcePack: {
+		// DisplayName: Data Config Resource Pack
+
+		RootSize: {
+			// Label: Root Size
+			// Tooltip: ""
+		}
+
+		CategoriesSizes: {
+			// Label: Categories Sizes
+			// Tooltip: ""
+		}
+
+		Scale: {
+			// Label: Scale
+			// Tooltip: ""
+		}
+
+		ScaleText: {
+			// Label: Scale Text
+			// Tooltip: ""
+		}
+
+		ScaleThreshold: {
+			// Label: Scale Threshold
+			// Tooltip: ""
+		}
+	}
 }
 
 Apply: Применить
@@ -163,4 +192,4 @@ BF_Period: Период
 BF_Update: Обновление
 BF_Search: Искать
 BF_Side: Сторона
-BF_Language: Язык
+BF_Language: Фильтры

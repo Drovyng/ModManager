@@ -342,57 +342,80 @@ namespace ModManager.Content.ModsList
             }
             base.Draw(spriteBatch);
         }
-        public void Set(bool? enabled = null, bool check = true)
+        public void Set(bool? enabled = null, bool check = true, bool doNotCheckIAmPro = false)
         {
             if (mod == null || cantUseText != null) return;
 
             enabled ??= !mod.Enabled;
 
-            if (enabled == true)
-            {
-                var l = References.ToList();
-                foreach (var item in UIModsNew.Instance.uIMods)
-                {
-                    if (item.mod != null && l.Contains(item.mod.Name))
-                    {
-                        if (item.cantUseText != null) return;
-                        item.Set(true, false);
-                        l.Remove(item.mod.Name);
-                    }
-                }
-                if (l.Count != 0)
-                {
-                    UIModsNew.Instance.AddCollections();
-                    UIModsNew.Instance.CheckChanged();
-                    System.Windows.Forms.MessageBox.Show("Missing mods: " + string.Join(",", l), "Missing Mods", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return;
-                }
-            }
-            else
-            {
-                var need = new List<string>();
-                foreach (var item in UIModsNew.Instance.uIMods)
-                {
-                    if (check && item.mod != null && item.References.Contains(mod.Name))
-                    {
-                        item.Set(false, false);
-                    }
-                    else if (item.mod != null && item.mod.Enabled && item != this)
-                    {
-                        need.AddRange(item.References);
-                    }
-                }
-                foreach (var item in UIModsNew.Instance.uIMods)
-                {
-                    if (item.mod != null && References.Contains(item.mod.Name) && !need.Contains(item.mod.Name))
-                    {
-                        Logging.PublicLogger.Info("Disabling " + item.mod.Name);
-                        item.Set(false, false);
-                    }
-                }
-            }
-            mod.Enabled = enabled.Value;
+            IEnumerable<UIModItemNew> savedList = null;
+            var act = UIModsNew.UndoRedoEnum.EnableMods;
 
+            if (!doNotCheckIAmPro)
+            {
+                if (enabled == true)
+                {
+                    savedList = UIModsNew.Instance.uIMods.Where(m => m.mod != null && !m.mod.Enabled);
+                    var l = References.ToList();
+                    foreach (var item in UIModsNew.Instance.uIMods)
+                    {
+                        if (item.mod != null && l.Contains(item.mod.Name))
+                        {
+                            if (item.cantUseText != null)
+                            {
+                                System.Windows.Forms.MessageBox.Show("Dependency Mod \"" + item.mod.DisplayNameClean + "\" Cant Be Enabled!", "Outdated Dependency Mod", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                return;
+                            }
+                            item.Set(true, false);
+                            l.Remove(item.mod.Name);
+                        }
+                    }
+                    savedList = savedList.Where(m => m.mod.Enabled);
+                    if (l.Count != 0)
+                    {
+                        UIModsNew.Instance.AddCollections();
+                        UIModsNew.Instance.CheckChanged();
+                        System.Windows.Forms.MessageBox.Show("Missing mods: " + string.Join(",", l), "Missing Mods", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+                else
+                {
+                    var need = new List<string>();
+                    foreach (var item in UIModsNew.Instance.uIMods)
+                    {
+                        if (check && item.mod != null && item.References.Contains(mod.Name))
+                        {
+                            item.Set(false, false);
+                        }
+                        else if (item.mod != null && item.mod.Enabled && item != this)
+                        {
+                            need.AddRange(item.References);
+                        }
+                    }
+                    savedList = UIModsNew.Instance.uIMods.Where(m => m.mod != null && m.mod.Enabled);
+                    act = UIModsNew.UndoRedoEnum.DisableMods;
+                    foreach (var item in UIModsNew.Instance.uIMods)
+                    {
+                        if (item.mod != null && References.Contains(item.mod.Name) && !need.Contains(item.mod.Name))
+                        {
+                            Logging.PublicLogger.Info("Disabling " + item.mod.Name);
+                            item.Set(false, false);
+                        }
+                    }
+                    savedList = savedList.Where(m => !m.mod.Enabled);
+                }
+            }
+            {
+                mod.Enabled = enabled.Value;
+                if (savedList != null && !doNotCheckIAmPro)
+                {
+                    var l = savedList.Where(m => m.mod.Enabled).Select(m => m.mod.Name).ToList();
+                    l.Add(mod.Name);
+                    UIModsNew.Instance.ToRedo.Clear();
+                    UIModsNew.Instance.ToUndo.Add((UIModsNew.UndoRedoEnum.EnableMods, l));
+                }
+            }
             if (toggle != null)
             {
                 toggle._texture = mod.Enabled ? ModManager.AssetToggleOn : ModManager.AssetToggleOff;
@@ -602,6 +625,9 @@ namespace ModManager.Content.ModsList
                     else
                     {
                         if (!path.StartsWith("/")) path = "/" + path;
+
+                        UIModsNew.Instance.ToRedo.Clear();
+                        UIModsNew.Instance.ToUndo.Add((UIModsNew.UndoRedoEnum.Move, (DataConfig.Instance.ModPaths.ToDictionary(), DataConfig.Instance.Folders.ToList())));
 
                         foreach (var itemMod in UIModsNew.Instance.SelectedItems)
                         {

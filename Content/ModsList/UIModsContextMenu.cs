@@ -13,6 +13,7 @@ using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.GameContent.ItemDropRules;
+using System.Linq;
 
 namespace ModManager.Content.ModsList
 {
@@ -60,11 +61,11 @@ namespace ModManager.Content.ModsList
                     UIModsNew.Instance.SelectedItems.Add(uIMod);
                     UIModsNew.Instance.ChangeSelection();
                 }
-                if (uIMod.mod == null)
+                if (uIMod.mod == null && UIModsNew.Instance.SelectedItem != null)
                 {
                     AddAction("CreateFolder");
-                    AddAction("Rename", UIModsNew.Instance.SelectedItem == null);
-                    AddAction("Delete", UIModsNew.Instance.SelectedItem == null);
+                    AddAction("Rename");
+                    AddAction("Delete");
                 }
                 else
                 {
@@ -156,6 +157,9 @@ namespace ModManager.Content.ModsList
                         var name = path + "New Folder" + (i == 0 ? "" : " (" + i + ")");
                         if (!cfg.Folders.Contains(name))
                         {
+                            UIModsNew.Instance.ToRedo.Clear();
+                            UIModsNew.Instance.ToUndo.Add((UIModsNew.UndoRedoEnum.ChangedFolders, DataConfig.Instance.Folders.ToList()));
+
                             cfg.Folders.Add(name);
                             cfg.Save();
                             UIModsNew.Instance.UpdateDisplayed();
@@ -273,7 +277,7 @@ namespace ModManager.Content.ModsList
                     UIModsNew.Instance.AddCollections();
                     return;
                 case "Remove":
-                    if (UIModsNew.Instance.OpenedCollections && UIModsNew.Instance.OpenedPath.Count != 0) return;
+                    if (!UIModsNew.Instance.OpenedCollections || UIModsNew.Instance.OpenedPath.Count == 0) return;
                     foreach (var item in UIModsNew.Instance.SelectedItems)
                     {
                         DataConfig.Instance.Collections[UIModsNew.Instance.OpenedPath[0]].Remove(item.mod.Name);
@@ -284,13 +288,13 @@ namespace ModManager.Content.ModsList
                 case "Enable":
                     foreach (var item in UIModsNew.Instance.SelectedItems)
                     {
-                        item.Set(true);
+                        if (item.mod != null) item.Set(true);
                     }
                     return;
                 case "Disable":
                     foreach (var item in UIModsNew.Instance.SelectedItems)
                     {
-                        item.Set(false);
+                        if (item.mod != null) item.Set(false);
                     }
                     return;
             }

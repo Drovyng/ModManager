@@ -13,7 +13,7 @@ This mod is intended to improve the experience of interacting with the tModLoade
 
 [hr]
 [h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   MODS LIST UPGRADE[/h1]
-[h2]Videos are outdated (Will Update In Beta)[/h2]
+[h2]Videos are outdated (For now)[/h2]
 [h2]Showcase: Scaling[/h2][video mp4=https://i.imgur.com/2fXljrE.mp4][/video]
 [h2]Showcase: Filters[/h2][video mp4=https://i.imgur.com/wRWQeyi.mp4][/video]
 [h2]Showcase: Renaming[/h2][video mp4=https://i.imgur.com/CUOoOF2.mp4][/video]
@@ -24,8 +24,5 @@ This mod is intended to improve the experience of interacting with the tModLoade
 [hr]
 [h1]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀PLANS[/h1]
 [olist]
-[*] PUBLISH [b]BETA VERSION[/b]
-[*] Rework [b]EVERY WORKSHOP MENU [i](almost)[/i][/b]
-[*] Add Other Mods Compatibility
-[*] etc...
+[*] Full Release
 [/olist]

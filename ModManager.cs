@@ -6,11 +6,15 @@ using Microsoft.Xna.Framework.Graphics;
 using ModManager.Content;
 using ModManager.Content.ModsBrowser;
 using ModManager.Content.ModsList;
+using ModManager.Content.ResourcePackSelection;
 using ReLogic.Content;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.GameContent.UI.States;
 using Terraria.ID;
+using Terraria.Initializers;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
@@ -91,7 +95,15 @@ namespace ModManager
             {
                 Interface.loadMods.OnUpdate += LoadMods_OnUpdate;
             }
+            On_Main.OpenResourcePacksMenu += On_Main_OpenResourcePacksMenu;
         }
+
+        private void On_Main_OpenResourcePacksMenu(On_Main.orig_OpenResourcePacksMenu orig, Terraria.UI.UIState uiStateToGoBackTo)
+        {
+            Main.menuMode = 888;
+            Main.MenuUI.SetState(new UIResourcePackSelectionMenuNew(uiStateToGoBackTo, Main.AssetSourceController, AssetInitializer.CreateResourcePackList(Main.instance.Services)));
+        }
+
         public void InitializeLoadModsMenu()
         {
             var pan = new UIPanel()

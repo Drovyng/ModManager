@@ -111,6 +111,35 @@ Configs: {
 		Blue.Label: Blue
 		Light.Label: Light
 	}
+
+	DataConfigResourcePack: {
+		DisplayName: Data Config Resource Pack
+
+		RootSize: {
+			Label: Root Size
+			Tooltip: ""
+		}
+
+		CategoriesSizes: {
+			Label: Categories Sizes
+			Tooltip: ""
+		}
+
+		Scale: {
+			Label: Scale
+			Tooltip: ""
+		}
+
+		ScaleText: {
+			Label: Scale Text
+			Tooltip: ""
+		}
+
+		ScaleThreshold: {
+			Label: Scale Threshold
+			Tooltip: ""
+		}
+	}
 }
 
 Apply: Apply
@@ -163,4 +192,4 @@ BF_Period: Period
 BF_Update: Update
 BF_Search: Search
 BF_Side: Side
-BF_Language: Language
+BF_Language: Filters

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -93,6 +94,18 @@ namespace ModManager.Content.ModsList
             "", "Name", "Author", "Version", "Flags"
         }; public static readonly IReadOnlyList<string> Filters = new List<string> { "▼", "▲", "⎯" };
 
+        public enum UndoRedoEnum : byte
+        {
+            EnableMods,
+            DisableMods,
+            RenameMod,
+            RenameFolder,
+            Move,
+            ChangedFolders
+        }
+        public List<(UndoRedoEnum, object)> ToUndo = new();
+        public List<(UndoRedoEnum, object)> ToRedo = new();
+
         public int FilterCategory = 1;
         public int FilterCategoryType = 0;
         public bool waitForReload;
@@ -129,32 +142,43 @@ namespace ModManager.Content.ModsList
         public void ActRename(string value)
         {
             if (SelectedItem == null) return;
-            if (SelectedItem.mod != null) DataConfig.Instance.ModNames[SelectedItem.mod.Name] = value;
+            if (SelectedItem.mod != null)
+            {
+                ToRedo.Clear();
+                ToUndo.Add((UndoRedoEnum.RenameMod, (SelectedItem.mod.Name, DataConfig.Instance.ModNames[SelectedItem.mod.Name])));
+                DataConfig.Instance.ModNames[SelectedItem.mod.Name] = value;
+            }
             else
             {
                 var name = SelectedItem.Name;
                 var path = string.Join("/", OpenedPath) + "/" + name; if (!path.StartsWith("/")) path = "/" + path;
                 var new_path = string.Join("/", OpenedPath) + "/" + value; if (!new_path.StartsWith("/")) new_path = "/" + new_path;
-                DataConfig.Instance.Folders.Remove(path);
-                var pairs = DataConfig.Instance.ModPaths.ToList();
-                foreach (var item in pairs)
-                {
-                    if (item.Value == path) DataConfig.Instance.ModPaths[item.Key] = new_path;
-                    else if (item.Value.StartsWith(path)) DataConfig.Instance.ModPaths[item.Key] = (new_path + item.Value.Substring(path.Length)).Replace("//", "/");
-                }
-                var list = DataConfig.Instance.Folders.ToList();
-                foreach (var item in list)
-                {
-                    if (item.StartsWith(path) && item.Substring(path.Length).Contains("/"))
-                    {
-                        DataConfig.Instance.Folders.Remove(item);
-                        DataConfig.Instance.Folders.Add((new_path + item.Substring(path.Length)).Replace("//", "/"));
-                    }
-                }
-                DataConfig.Instance.Folders.Add(new_path);
+                ActRenameFolder(path, new_path);
+                ToRedo.Clear();
+                ToUndo.Add((UndoRedoEnum.RenameFolder, (new_path, path)));
             }
             DataConfig.Instance.Save();
             UpdateDisplayed();
+        }
+        public void ActRenameFolder(string path, string new_path)
+        {
+            DataConfig.Instance.Folders.Remove(path);
+            var pairs = DataConfig.Instance.ModPaths.ToList();
+            foreach (var item in pairs)
+            {
+                if (item.Value == path) DataConfig.Instance.ModPaths[item.Key] = new_path;
+                else if (item.Value.StartsWith(path)) DataConfig.Instance.ModPaths[item.Key] = (new_path + item.Value.Substring(path.Length)).Replace("//", "/");
+            }
+            var list = DataConfig.Instance.Folders.ToList();
+            foreach (var item in list)
+            {
+                if (item.StartsWith(path) && item.Substring(path.Length).Contains("/"))
+                {
+                    DataConfig.Instance.Folders.Remove(item);
+                    DataConfig.Instance.Folders.Add((new_path + item.Substring(path.Length)).Replace("//", "/"));
+                }
+            }
+            DataConfig.Instance.Folders.Add(new_path);
         }
         public void ActDelete()
         {
@@ -1055,6 +1079,7 @@ namespace ModManager.Content.ModsList
             var grid = scale >= scaleThreshold;
             var pos = Vector2.Zero;
             var c = mainList.GetInnerDimensions();
+            float addGridHeight = 0;
             foreach (var item in mainListIn.Elements)
             {
                 var mod = item as UIModItemNew;
@@ -1069,11 +1094,13 @@ namespace ModManager.Content.ModsList
                         pos.Y += mod.GetOuterDimensions().Height;
                         mod.Left.Precent = 0;
                         pos.X = add;
+                        addGridHeight = 0;
                     }
                     else
                     {
                         mod.Left.Precent = pos.X;
                         pos.X += add;
+                        addGridHeight = mod.GetOuterDimensions().Height;
                     }
                 }
                 else mod.Left.Precent = 0;
@@ -1081,6 +1108,7 @@ namespace ModManager.Content.ModsList
                 mod.Top.Pixels = pos.Y;
                 if (!grid) pos.Y += mod.GetOuterDimensions().Height;
             }
+            if (grid) pos.Y += addGridHeight;
             pos.Y = MathF.Max(pos.Y, c.Height);
             mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();
@@ -1207,6 +1235,106 @@ namespace ModManager.Content.ModsList
             Interface.modInfo.Show(SelectedItem.Name, SelectedItem.mod.DisplayName, 10000, SelectedItem.mod, SelectedItem.mod.properties.description, SelectedItem.mod.properties.homepage);
         }
         private float saveTimer = 0;
+        public void Undo()
+        {
+            if (ToUndo.Count == 0) return;
+            var i = ToUndo[ToUndo.Count - 1];
+
+            switch (i.Item1)
+            {
+                case UndoRedoEnum.EnableMods:
+                    foreach (var item in i.Item2 as List<string>)
+                    {
+                        var mod1 = uIMods.Find(m => m.mod != null && m.mod.Name == item);
+                        mod1?.Set(false, false, true);   // Disabling Back
+                    }
+                    ToRedo.Add(i);
+                    break;
+                case UndoRedoEnum.DisableMods:
+                    foreach (var item in i.Item2 as List<string>)
+                    {
+                        var mod2 = uIMods.Find(m => m.mod != null && m.mod.Name == item);
+                        mod2?.Set(true, false, true);    // Enabling Back
+                    }
+                    ToRedo.Add(i);
+                    break;
+                case UndoRedoEnum.RenameMod:
+                    (string, string) j1 = (dynamic)i.Item2;   // Mod Name | Rename Name
+                    ToRedo.Add((UndoRedoEnum.RenameMod, (j1.Item1, DataConfig.Instance.ModNames[j1.Item1])));
+                    DataConfig.Instance.ModNames[j1.Item1] = j1.Item2;
+                    DataConfig.Instance.Save();
+                    break;
+                case UndoRedoEnum.RenameFolder:
+                    (string, string) j2 = (dynamic)i.Item2;   // Last Path | Rename Path
+                    ToRedo.Add((UndoRedoEnum.RenameFolder, (j2.Item2, j2.Item1)));
+                    ActRenameFolder(j2.Item1, j2.Item2);
+                    DataConfig.Instance.Save();
+                    break;
+                case UndoRedoEnum.Move:
+                    (Dictionary<string, string>, List<string>) j3 = (dynamic)i.Item2;    // Taken from config: ModsPaths | Folders
+                    ToRedo.Add((UndoRedoEnum.Move, (DataConfig.Instance.ModPaths.ToDictionary(), DataConfig.Instance.Folders.ToList())));
+                    DataConfig.Instance.ModPaths = j3.Item1;
+                    DataConfig.Instance.Folders = j3.Item2;
+                    DataConfig.Instance.Save();
+                    break;
+                case UndoRedoEnum.ChangedFolders:
+                    ToRedo.Add((UndoRedoEnum.ChangedFolders, DataConfig.Instance.Folders.ToList()));
+                    DataConfig.Instance.Folders = i.Item2 as List<string>;
+                    DataConfig.Instance.Save();
+                    break;
+            }
+            ToUndo.Remove(i);
+        }
+        public void Redo()
+        {
+            if (ToRedo.Count == 0) return;
+            var i = ToRedo[ToRedo.Count - 1];
+
+            switch (i.Item1)
+            {
+                case UndoRedoEnum.EnableMods:
+                    foreach (var item in i.Item2 as List<string>)
+                    {
+                        var mod1 = uIMods.Find(m => m.mod != null && m.mod.Name == item);
+                        mod1?.Set(true, false, true);   // Disabling Back
+                    }
+                    ToUndo.Add(i);
+                    break;
+                case UndoRedoEnum.DisableMods:
+                    foreach (var item in i.Item2 as List<string>)
+                    {
+                        var mod2 = uIMods.Find(m => m.mod != null && m.mod.Name == item);
+                        mod2?.Set(false, false, true);    // Enabling Back
+                    }
+                    ToUndo.Add(i);
+                    break;
+                case UndoRedoEnum.RenameMod:
+                    var j1 = i.Item2 as Tuple<string, string>;   // Mod Name | Rename Name
+                    ToUndo.Add((UndoRedoEnum.RenameMod, (j1.Item1, DataConfig.Instance.ModNames[j1.Item1])));
+                    DataConfig.Instance.ModNames[j1.Item1] = j1.Item2;
+                    DataConfig.Instance.Save();
+                    break;
+                case UndoRedoEnum.RenameFolder:
+                    var j2 = i.Item2 as Tuple<string, string>;   // Last Path | Rename Path
+                    ToUndo.Add((UndoRedoEnum.RenameFolder, (j2.Item2, j2.Item1)));
+                    ActRenameFolder(j2.Item1, j2.Item2);
+                    DataConfig.Instance.Save();
+                    break;
+                case UndoRedoEnum.Move:
+                    var j3 = i.Item2 as Tuple<Dictionary<string, string>, List<string>>;    // Taken from config: ModsPaths | Folders
+                    ToUndo.Add((UndoRedoEnum.Move, (DataConfig.Instance.ModPaths.ToDictionary(), DataConfig.Instance.Folders.ToList())));
+                    DataConfig.Instance.ModPaths = j3.Item1;
+                    DataConfig.Instance.Folders = j3.Item2;
+                    DataConfig.Instance.Save();
+                    break;
+                case UndoRedoEnum.ChangedFolders:
+                    ToUndo.Add((UndoRedoEnum.ChangedFolders, DataConfig.Instance.Folders.ToList()));
+                    DataConfig.Instance.Folders = i.Item2 as List<string>;
+                    DataConfig.Instance.Save();
+                    break;
+            }
+            ToRedo.Remove(i);
+        }
         public override void Update(GameTime gameTime)
         {
             if (NeedUpdate)
@@ -1214,7 +1342,17 @@ namespace ModManager.Content.ModsList
                 UpdateDisplayed();
                 NeedUpdate = false;
             }
-
+            if (Main.keyState.PressingControl())
+            {
+                if (Main.oldKeyState.IsKeyUp(Keys.Z) && Main.keyState.IsKeyDown(Keys.Z))
+                {
+                    Undo();
+                }
+                else if (Main.oldKeyState.IsKeyUp(Keys.Y) && Main.keyState.IsKeyDown(Keys.Y))
+                {
+                    Redo();
+                }
+            }
             UIInputTextFieldPriority.MaxPriority = popupRename.Top.Pixels > -1000 ? 1 : 0;
             if (CantLeaveTimer > 0)
             {

@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using ModManager.Content.ModsList;
-using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ID;
 using Terraria.Localization;
-using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.ModLoader.UI.Elements;
@@ -16,7 +11,6 @@ using Terraria.ModLoader.UI.ModBrowser;
 using Terraria.Social.Base;
 using Terraria.Social.Steam;
 using Terraria.UI;
-using static Terraria.Localization.NetworkText;
 
 namespace ModManager.Content.ModsBrowser
 {
@@ -38,8 +32,6 @@ namespace ModManager.Content.ModsBrowser
             public override List<SnapPoint> GetSnapPoints() => new List<SnapPoint>();
         }
         public static UIModBrowserNew Instance;
-
-        public UIModBrowserItemNew Selected;
 
         public float scale = DataConfigBrowser.Instance.Scale;
         public float scaleText = DataConfigBrowser.Instance.ScaleText;
@@ -88,8 +80,8 @@ namespace ModManager.Content.ModsBrowser
 
             root = new()
             {
-                Width = { Pixels = MathF.Max(DataConfig.Instance.RootSize[0], 400) },
-                Height = { Pixels = MathF.Max(DataConfig.Instance.RootSize[1], 350) },
+                Width = { Pixels = MathF.Max(DataConfigBrowser.Instance.RootSize[0], 400) },
+                Height = { Pixels = MathF.Max(DataConfigBrowser.Instance.RootSize[1], 350) },
                 HAlign = 0.5f,
                 VAlign = 0.5f,
                 MinHorizontal = 400,
@@ -100,6 +92,7 @@ namespace ModManager.Content.ModsBrowser
                 UseRight = true,
                 centered = true
             };
+            root.SetPadding(0);
             root.OnResizing += Redesign;
             Append(root);
 
@@ -554,6 +547,7 @@ namespace ModManager.Content.ModsBrowser
             var grid = scale >= scaleThreshold;
             var pos = Vector2.Zero;
             var c = mainList.GetInnerDimensions();
+            float addGridHeight = 0;
             foreach (var item in mainListIn.Elements)
             {
                 var mod = item as UIModBrowserItemNew;
@@ -566,11 +560,13 @@ namespace ModManager.Content.ModsBrowser
                         pos.Y += mod.GetOuterDimensions().Height;
                         mod.Left.Precent = 0;
                         pos.X = add;
+                        addGridHeight = 0;
                     }
                     else
                     {
                         mod.Left.Precent = pos.X;
                         pos.X += add;
+                        addGridHeight = mod.GetOuterDimensions().Height;
                     }
                 }
                 else mod.Left.Precent = 0;
@@ -578,12 +574,12 @@ namespace ModManager.Content.ModsBrowser
                 mod.Top.Pixels = pos.Y;
                 if (!grid) pos.Y += mod.GetOuterDimensions().Height;
             }
+            if (grid) pos.Y += addGridHeight;
             pos.Y = MathF.Max(pos.Y, c.Height);
             mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();
             mainScrollbar.SetView(c.Height, pos.Y);
         }
-        
         public void AddCategories()
         {
             categoriesHorizontal.Elements.Clear();

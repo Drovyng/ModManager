@@ -240,7 +240,6 @@ namespace ModManager.Content.ModsBrowser
             base.Update(gameTime);
 
             BackgroundColor = IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
-            BorderColor = UIModBrowserNew.Instance.Selected == this ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
 
             if (mod.NeedUpdate)
             {

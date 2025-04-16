@@ -1,1 +1,3 @@
-Fully reworked Mods Browser
+Undo & Redo For Mods List (by CTRL+Z, CTRL+Y)  (Still WIP)
+Reworked ResourcePack Selection Menu
+Fixed bugs

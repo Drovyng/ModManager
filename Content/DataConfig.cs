@@ -56,4 +56,25 @@ namespace ModManager.Content
             ConfigManager.Save(this);
         }
     }
+    public class DataConfigResourcePack : ModConfig
+    {
+        public static DataConfigResourcePack Instance => ModContent.GetInstance<DataConfigResourcePack>();
+        public override ConfigScope Mode => ConfigScope.ClientSide;
+
+        public int[] RootSize = [700, 600];
+
+        public int[] CategoriesSizes = [0, 0, 0];
+
+        [DefaultValue(1f)]
+        public float Scale = 1;
+        [DefaultValue(1f)]
+        public float ScaleText = 1;
+        [DefaultValue(3f)]
+        public float ScaleThreshold = 3;
+
+        public void Save()
+        {
+            ConfigManager.Save(this);
+        }
+    }
 }
