@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ModManager.Content;
@@ -9,11 +8,7 @@ using ModManager.Content.ModsList;
 using ModManager.Content.ResourcePackSelection;
 using ReLogic.Content;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.GameContent.UI.States;
-using Terraria.ID;
 using Terraria.Initializers;
 using Terraria.Localization;
 using Terraria.ModLoader;

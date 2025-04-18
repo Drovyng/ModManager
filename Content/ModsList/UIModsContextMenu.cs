@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Humanizer;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,8 +10,9 @@ using Terraria.Localization;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
-using Terraria.GameContent.ItemDropRules;
 using System.Linq;
+using Terraria.ModLoader;
+using Terraria.ModLoader.Config.UI;
 
 namespace ModManager.Content.ModsList
 {
@@ -78,6 +77,7 @@ namespace ModManager.Content.ModsList
                     {
                         AddAction("Info");
                         AddAction(uIMod.mod.Enabled ? "Disable" : "Enable");
+                        AddAction("Config", !(ModLoader.TryGetMod(UIModsNew.Instance.SelectedItem.mod.Name, out var mod) && ConfigManager.Configs.ContainsKey(mod) && ConfigManager.Configs[mod].Count > 0));
                         AddAction("Rename");
                         AddAction(UIModsNew.Instance.OpenedCollections ? "Remove" : "Delete");
                     }
@@ -147,6 +147,20 @@ namespace ModManager.Content.ModsList
         {
             switch (Name)
             {
+                case "Config":
+                    if (UIModsNew.Instance.SelectedItem == null || UIModsNew.Instance.SelectedItem.mod == null) return;
+                    if (ModLoader.TryGetMod(UIModsNew.Instance.SelectedItem.mod.Name, out var mod) && ConfigManager.Configs.ContainsKey(mod) && ConfigManager.Configs[mod].Count > 0)
+                    {
+                        Main.menuMode = Interface.modConfigListID;
+                        Interface.modConfig.openedFromModder = true;
+                        Interface.modConfig.modderOnClose = () =>
+                        {
+                            Main.menuMode = Interface.modsMenuID;
+                        };
+                        Interface.modConfig.mod = mod;
+                        Interface.modConfigList.ModToSelectOnOpen = mod;
+                    }
+                    return;
                 case "CreateFolder":
                     var cfg = DataConfig.Instance;
                     var path = string.Join("/", UIModsNew.Instance.OpenedPath) + "/";

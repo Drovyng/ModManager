@@ -157,6 +157,7 @@ DeleteTitle: Подтверждение Удаления
 CreateFolder: Создать Папку
 Enable: Включить
 Disable: Выключить
+Config: Конфигурация
 CreateCollection: Создать Коллекцию
 CreateConfigCollection: Создать Конфиг-Коллекцию
 NoActions: Нет доступных действий

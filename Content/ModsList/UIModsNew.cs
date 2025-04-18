@@ -748,13 +748,17 @@ namespace ModManager.Content.ModsList
                 });
                 buttonConfig.OnLeftClick += (e, l) =>
                 {
-                    OnDeactivate();
                     Main.menuMode = Interface.modConfigListID;
+                    Interface.modConfig.openedFromModder = true;
                     Interface.modConfig.modderOnClose = () =>
                     {
                         Main.menuMode = Interface.modsMenuID;
                     };
-                    Interface.modConfig.openedFromModder = true;
+                    if (SelectedItem != null && ModLoader.TryGetMod(SelectedItem.mod.Name, out var mod) && ConfigManager.Configs.ContainsKey(mod) && ConfigManager.Configs[mod].Count > 0)
+                    {
+                        Interface.modConfig.mod = mod;
+                        Interface.modConfigList.ModToSelectOnOpen = mod;
+                    }
                 };
                 ontopButtons.Append(buttonConfig);
                 var buttonApply = new UIPanelStyled()
@@ -1009,6 +1013,21 @@ namespace ModManager.Content.ModsList
         }
         private void Root_OnRightClick(UIMouseEvent evt, UIElement listeningElement)
         {
+            if (evt.Target is UIInputTextField field1)
+            {
+                field1.Text = "";
+                return;
+            }
+            if (evt.Target is UIInputTextFieldPriority<string> field2)
+            {
+                field2.Text = "";
+                return;
+            }
+            if (evt.Target is UIInputTextFieldPriority<LocalizedText> field3)
+            {
+                field3.Text = "";
+                return;
+            }
             contextMenu.Target = evt.Target;
             contextMenu.Popup();
         }

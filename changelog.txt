@@ -1,3 +1,2 @@
-Undo & Redo For Mods List (by CTRL+Z, CTRL+Y)  (Still WIP)
-Reworked ResourcePack Selection Menu
-Fixed bugs
+Right Click On Input Field Now Clear It
+Added "Config" Action and "Config" Button now open config of selected mod

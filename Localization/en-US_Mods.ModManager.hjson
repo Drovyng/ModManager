@@ -157,6 +157,7 @@ DeleteTitle: Deletion Confirmation
 CreateFolder: Create Folder
 Enable: Enable
 Disable: Disable
+Config: Config
 CreateCollection: Create Collection
 CreateConfigCollection: Create Config Collection
 NoActions: No actions available
