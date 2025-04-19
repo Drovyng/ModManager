@@ -678,6 +678,10 @@ namespace ModManager.Content.ModsList
             }
             if (other.mod == null) return 1;
             if (mod == null) return -1;
+            if (FilterCategory == -5)
+            {
+                return mod.lastModified.CompareTo(other.mod.lastModified) * -mul;
+            }
             if (FilterCategory == 0)
             {
                 return mod.Enabled.CompareTo(other.mod.Enabled) * -mul;

@@ -61,6 +61,16 @@ Configs: {
 			// Label: Config Collections
 			// Tooltip: ""
 		}
+
+		FilterCategory: {
+			// Label: Filter Category
+			// Tooltip: ""
+		}
+
+		FilterCategoryType: {
+			// Label: Filter Category Type
+			// Tooltip: ""
+		}
 	}
 
 	DataConfigBrowser: {
@@ -185,6 +195,7 @@ Cat_Author: Автор
 Cat_Version: Версия
 Cat_Flags: Флаги
 Cat_Date: Дата
+Cat_Recent: Последние Обновлённые
 SF_EveryMod: Все Моды
 SF_MyMods: Мои Моды
 SF_Custom: Кастомный

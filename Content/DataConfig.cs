@@ -30,6 +30,11 @@ namespace ModManager.Content
         [DefaultValue(3f)]
         public float ScaleThreshold = 3;
 
+        [DefaultValue(1)]
+        public int FilterCategory;
+        [DefaultValue(0)]
+        public int FilterCategoryType;
+
         public void Save()
         {
             ConfigManager.Save(this);

@@ -50,6 +50,9 @@ namespace ModManager.Content.ModsList
         public UIPanelStyled searchFieldOut;
         public UIInputTextFieldPriority<LocalizedText> searchField;
 
+        public UIPanelStyled categoryRecent;
+        public UITextDots<string> categoryRecentText;
+
         public UIList mainList;
         public UIDoNotDrawNonArea mainListIn;
         public UIScrollbar mainScrollbar;
@@ -106,8 +109,8 @@ namespace ModManager.Content.ModsList
         public List<(UndoRedoEnum, object)> ToUndo = new();
         public List<(UndoRedoEnum, object)> ToRedo = new();
 
-        public int FilterCategory = 1;
-        public int FilterCategoryType = 0;
+        public int FilterCategory = DataConfig.Instance.FilterCategory;
+        public int FilterCategoryType = DataConfig.Instance.FilterCategoryType;
         public bool waitForReload;
         public void ReloadModsTask()
         {
@@ -316,9 +319,15 @@ namespace ModManager.Content.ModsList
             pathHorizontalOut.Append(pathHorizontal);
             pathHorizontalOut.Append(new UIAlphaFixer());
 
-            searchFieldOut = new()
+            var el = new UIElement()
             {
                 Width = { Precent = 1 },
+                Height = { Pixels = 32 }
+            };
+            searchFieldOut = new()
+            {
+                Width = { Precent = 0.75f },
+                Left = { Precent = 0.25f },
                 Height = { Pixels = 32 }
             };
             searchFieldOut.SetPadding(0);
@@ -335,7 +344,54 @@ namespace ModManager.Content.ModsList
                 UpdateDisplayed();
             };
             searchFieldOut.Append(searchField);
-            mainVertical.Append(searchFieldOut);
+
+            categoryRecent = new UIPanelStyled()
+            {
+                Width = { Precent = 0.25f },
+                Height = { Pixels = 32 }
+            }; categoryRecent.SetPadding(0); categoryRecent.FadedMouseOver();
+            categoryRecent.Append(new UITextDots<LocalizedText>()
+            {
+                Width = { Precent = 1f, Pixels = -32 },
+                Height = { Precent = 1f },
+                Left = { Pixels = 6 },
+                Top = { Pixels = 4 },
+                align = 0.5f,
+                text = ModManager.Get("Cat_Recent"),
+            });
+            categoryRecent.OnLeftClick += delegate
+            {
+                if (FilterCategory == -5)
+                {
+                    FilterCategoryType++;
+                    FilterCategoryType %= 2;
+                }
+                else
+                {
+                    FilterCategory = -5;
+                    FilterCategoryType = 0;
+                }
+                Save();
+                AddCategories();
+                Update(new());
+                Update(new());
+                UpdateDisplayed();
+                RedesignUIMods();
+            };
+            categoryRecentText = new UITextDots<string>()
+            {
+                Width = { Precent = 1f, Pixels = -8 },
+                Height = { Precent = 1f },
+                Top = { Pixels = 4 },
+                color = Color.Black,
+                align = 1f,
+                scale = 1f,
+                text = FilterCategory == -5 ? Filters[FilterCategoryType] : Filters[2]
+            };
+            categoryRecent.Append(categoryRecentText);
+            el.Append(categoryRecent);
+            el.Append(searchFieldOut);
+            mainVertical.Append(el);
 
             contextMenu = new();
             contextMenu.OnDraw = DrawGrabbedMod;
@@ -1205,6 +1261,8 @@ namespace ModManager.Content.ModsList
         {
             categoriesHorizontal.Elements.Clear();
 
+            categoryRecentText.text = FilterCategory == -5 ? Filters[FilterCategoryType] : Filters[2];
+
             var k = -1;
             foreach (var item in Categories)
             {
@@ -1228,7 +1286,10 @@ namespace ModManager.Content.ModsList
                     }
                     Save();
                     AddCategories();
+                    Update(new());
+                    Update(new());
                     UpdateDisplayed();
+                    RedesignUIMods();
                 };
                 i.OnResizing = RedesignUIMods;
                 categoriesHorizontal.Append(i);
@@ -1444,6 +1505,9 @@ namespace ModManager.Content.ModsList
             cfg.Scale = scale;
             cfg.ScaleThreshold = scaleThreshold;
             cfg.ScaleText = scaleText;
+
+            cfg.FilterCategory = FilterCategory;
+            cfg.FilterCategoryType = FilterCategoryType;
 
             cfg.Save();
         }

@@ -1,2 +1,3 @@
-Right Click On Input Field Now Clear It
-Added "Config" Action and "Config" Button now open config of selected mod
+Fixed ResourePack Menu
+Added ModsList Sorting By Recent
+Filter Categories Is Now Saved

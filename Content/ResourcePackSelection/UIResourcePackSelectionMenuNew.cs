@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using ModManager.Content.ModsList;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent.UI.States;
@@ -203,6 +204,104 @@ namespace ModManager.Content.ResourcePackSelection
                 ontopSettings.Append(sliderThresholdScale);
                 topPanel.Append(ontopSettings);
             }
+            {
+                var ontopButtons = new UIPanelStyled()
+                {
+                    Width = { Precent = 0.5f },
+                    Left = { Precent = 0.5f },
+                    Height = { Precent = 1 },
+                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8
+                };
+                var buttonEnableAll = new UIPanelStyled()
+                {
+                    Width = { Precent = 0.5f },
+                    Height = { Precent = 1f / 3f },
+                    Top = { Precent = 2f / 3f }
+                }.FadedMouseOver();
+                buttonEnableAll.Append(new UITextDots<LocalizedText>()
+                {
+                    text = Language.GetText("tModLoader.ModsEnableAll"),
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 },
+                    align = 0.5f
+                });
+                buttonEnableAll.OnLeftClick += (e, l) =>
+                {
+                    foreach (var item in uIResourcePacks)
+                    {
+                        item.Set(true);
+                    }
+                };
+                ontopButtons.Append(buttonEnableAll);
+                var buttonDisableAll = new UIPanelStyled()
+                {
+                    Width = { Precent = 0.5f },
+                    Left = { Precent = 0.5f },
+                    Height = { Precent = 1f / 3f },
+                    Top = { Precent = 2f / 3f }
+                }.FadedMouseOver();
+                buttonDisableAll.Append(new UITextDots<LocalizedText>()
+                {
+                    text = Language.GetText("tModLoader.ModsDisableAll"),
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 },
+                    align = 0.5f
+                });
+                buttonDisableAll.OnLeftClick += (e, l) =>
+                {
+                    foreach (var item in uIResourcePacks)
+                    {
+                        item.Set(false);
+                    }
+                };
+                ontopButtons.Append(buttonDisableAll);
+                var buttonApply = new UIPanelStyled()
+                {
+                    Width = { Precent = 1f },
+                    Height = { Precent = 1f / 3f },
+                }.FadedMouseOver();
+                buttonApply.Append(new UITextDots<LocalizedText>()
+                {
+                    text = ModManager.Get("ButtonApplyChanges"),
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 },
+                    align = 0.5f
+                });
+                buttonApply.OnLeftClick += (e, l) =>
+                {
+                    SoundEngine.PlaySound(11);
+                    _sourceController.UseResourcePacks(new ResourcePackList(uIResourcePacks.Select(pack => pack.pack)));
+                    Main.SaveSettings();
+                    Populate();
+                };
+                ontopButtons.Append(buttonApply);
+                var buttonReject = new UIPanelStyled()
+                {
+                    Width = { Precent = 1f },
+                    Height = { Precent = 1f / 3f },
+                    Top = { Precent = 1f / 3f },
+                }.FadedMouseOver();
+                buttonReject.Append(new UITextDots<LocalizedText>()
+                {
+                    text = ModManager.Get("ButtonRejectChanges"),
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    Top = { Pixels = 4 },
+                    align = 0.5f
+                });
+                buttonReject.OnLeftClick += (e, l) =>
+                {
+                    foreach (var item in uIResourcePacks)
+                    {
+                        item.Set(item.loaded);
+                    }
+                };
+                ontopButtons.Append(buttonReject);
+                topPanel.Append(ontopButtons);
+            }
             AddCategories();
         }
         public override void OnActivate()
@@ -210,10 +309,6 @@ namespace ModManager.Content.ResourcePackSelection
             ToUndo = new();
             ToRedo = new();
             Populate();
-        }
-        public override void OnDeactivate()
-        {
-            _sourceController.UseResourcePacks(new ResourcePackList(uIResourcePacks.Where(pack => pack.pack.IsEnabled).Select(pack => pack.pack)));
         }
         public void Populate()
         {
