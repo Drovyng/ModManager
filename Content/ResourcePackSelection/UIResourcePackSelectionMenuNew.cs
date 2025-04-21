@@ -30,6 +30,10 @@ namespace ModManager.Content.ResourcePackSelection
         public UIDoNotDrawNonArea mainListIn;
         public UIScrollbar mainScrollbar;
 
+        public UIList sortList;
+        public UIDoNotDrawNonArea sortListIn;
+        public UIScrollbar sortScrollbar;
+
         public UIPanelStyled filtersHorizontalOut;
         public UIContentList filtersHorizontal;
         public int currentFiltersSet;
@@ -42,6 +46,7 @@ namespace ModManager.Content.ResourcePackSelection
         public int FilterCategoryType = 0;
 
         public List<UIResourcePackNew> uIResourcePacks;
+        public List<UIResourcePackToSort> uIResourcePacksSorted;
 
         public List<(UIResourcePackNew, bool)> ToUndo = new();
         public List<(UIResourcePackNew, bool)> ToRedo = new();
@@ -78,33 +83,40 @@ namespace ModManager.Content.ResourcePackSelection
 
             categoriesHorizontalOut = new()
             {
-                Width = { Precent = 1, Pixels = -32 },
+                Width = { Precent = 0.7f },
                 Height = { Pixels = 32 },
                 Top = { Pixels = 100 },
+                Left = { Precent = 0.3f }
             };
             categoriesHorizontalOut.SetPadding(0);
             root.Append(categoriesHorizontalOut);
 
             categoriesHorizontal = new()
             {
-                Width = { Precent = 1 },
+                Width = { Precent = 1f },
                 Height = { Precent = 1 },
                 OverflowHidden = true
             };
             categoriesHorizontalOut.Append(categoriesHorizontal);
 
+            var main = new UIPanelStyled()
+            {
+                Width = { Precent = 0.7f },
+                Height = { Precent = 1, Pixels = -132 },
+                HAlign = 1,
+                Top = { Pixels = 132 }
+            }; main.SetPadding(0);
             mainScrollbar = new UIScrollbar()
             {
                 HAlign = 1,
-                Height = { Precent = 1, Pixels = -108 },
+                Height = { Precent = 1, Pixels = -16 },
                 MarginRight = 12,
-                Top = { Pixels = 108 }
+                Top = { Pixels = 8 }
             }.WithView(1000, 1000);
             mainList = new()
             {
                 Width = { Precent = 1, Pixels = -32 },
-                Height = { Precent = 1, Pixels = -132 },
-                Top = { Pixels = 132 },
+                Height = { Precent = 1 },
                 OverflowHidden = true
             };
             mainListIn = new()
@@ -115,9 +127,40 @@ namespace ModManager.Content.ResourcePackSelection
             mainList.OnScrollWheel += (e, _) => { mainScrollbar.ViewPosition -= e.ScrollWheelValue; if (e.ScrollWheelValue != 0) Redesign(); };
             mainListIn.OnUpdate += (_) => { mainListIn.Top.Pixels = -mainScrollbar.ViewPosition; mainList.Recalculate(); };
             mainList.Append(mainListIn);
+            main.Append(mainScrollbar);
+            main.Append(mainList);
+            root.Append(main);
 
-            root.Append(mainScrollbar);
-            root.Append(mainList);
+            var sort = new UIPanelStyled()
+            {
+                Width = { Precent = 0.3f },
+                Height = { Precent = 1, Pixels = -100 },
+                Top = { Pixels = 100 }
+            }; sort.SetPadding(0);
+            sortScrollbar = new UIScrollbar()
+            {
+                HAlign = 1,
+                Height = { Precent = 1, Pixels = -16 },
+                MarginRight = 12,
+                Top = { Pixels = 8 }
+            }.WithView(1000, 1000);
+            sortList = new()
+            {
+                Width = { Precent = 1, Pixels = -32 },
+                Height = { Precent = 1 },
+                OverflowHidden = true
+            };
+            sortListIn = new()
+            {
+                Width = { Precent = 1 },
+                Height = { Precent = 1 }
+            };
+            sortList.OnScrollWheel += (e, _) => { sortScrollbar.ViewPosition -= e.ScrollWheelValue; if (e.ScrollWheelValue != 0) Redesign(); };
+            sortListIn.OnUpdate += (_) => { sortListIn.Top.Pixels = -sortScrollbar.ViewPosition; sortList.Recalculate(); };
+            sortList.Append(sortListIn);
+            sort.Append(sortScrollbar);
+            sort.Append(sortList);
+            root.Append(sort);
 
             var topPanel = new UIPanelStyled()
             {
@@ -130,9 +173,8 @@ namespace ModManager.Content.ResourcePackSelection
                 var ontopSettings = new UIPanelStyled()
                 {
                     Width = { Precent = 0.5f },
-                    Height = { Precent = 1 },
-                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8
-                };
+                    Height = { Precent = 1 }
+                }; ontopSettings.SetPadding(8);
                 var labelScale = new UITextDots<LocalizedText>()
                 {
                     Width = { Precent = 0.45f },
@@ -209,9 +251,8 @@ namespace ModManager.Content.ResourcePackSelection
                 {
                     Width = { Precent = 0.5f },
                     Left = { Precent = 0.5f },
-                    Height = { Precent = 1 },
-                    PaddingTop = PaddingBottom = PaddingLeft = PaddingRight = 8
-                };
+                    Height = { Precent = 1 }
+                }; ontopButtons.SetPadding(0);
                 var buttonEnableAll = new UIPanelStyled()
                 {
                     Width = { Precent = 0.5f },
@@ -273,7 +314,7 @@ namespace ModManager.Content.ResourcePackSelection
                 buttonApply.OnLeftClick += (e, l) =>
                 {
                     SoundEngine.PlaySound(11);
-                    _sourceController.UseResourcePacks(new ResourcePackList(uIResourcePacks.Select(pack => pack.pack)));
+                    _sourceController.UseResourcePacks(new ResourcePackList(uIResourcePacks.Where(p => p.pack.IsEnabled).Select(pack => pack.pack)));
                     Main.SaveSettings();
                     Populate();
                 };
@@ -313,9 +354,11 @@ namespace ModManager.Content.ResourcePackSelection
         public void Populate()
         {
             uIResourcePacks = new(_packsList._resourcePacks.Count);
+            uIResourcePacksSorted = new(_packsList._resourcePacks.Count);
             foreach (var item in _packsList._resourcePacks)
             {
                 uIResourcePacks.Add(new UIResourcePackNew(item));
+                uIResourcePacksSorted.Add(new UIResourcePackToSort(item));
             }
             UpdateDisplayed();
         }
@@ -331,6 +374,40 @@ namespace ModManager.Content.ResourcePackSelection
             }
             mainListIn.Recalculate();
             Redesign();
+            UpdateDisplayerToSort();
+        }
+        public void UpdateDisplayerToSort()
+        {
+            sortListIn.Elements.Clear();
+            uIResourcePacksSorted.Sort((left, right) => { return left.Sort(right); });
+            int num = 0;
+            foreach (var item in uIResourcePacksSorted.Where(pack => pack.pack.IsEnabled))
+            {
+                item.pack.SortingOrder = num;
+                num += 2;
+                sortListIn.Append(item);
+                item.Activate();
+            }
+            sortListIn.Recalculate();
+            RedesingSorted();
+        }
+        public void RedesingSorted()
+        {
+            float pos = 0f;
+            var c = sortList.GetInnerDimensions();
+            foreach (var item in sortListIn.Elements)
+            {
+                var pack = item as UIResourcePackToSort;
+                pack.Redesign();
+                pack.Left.Precent = 0;
+                pack.Left.Pixels = 0;
+                pack.Top.Pixels = pos;
+                pos += pack.GetOuterDimensions().Height;
+            }
+            pos = MathF.Max(pos, c.Height);
+            sortListIn.Height.Pixels = pos;
+            sortList.Recalculate();
+            sortScrollbar.SetView(c.Height, pos);
         }
         public void Redesign()
         {
@@ -370,6 +447,7 @@ namespace ModManager.Content.ResourcePackSelection
             mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();
             mainScrollbar.SetView(c.Height, pos.Y);
+            RedesingSorted();
         }
         public void AddCategories()
         {

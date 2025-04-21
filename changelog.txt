@@ -1,3 +1,1 @@
-Fixed ResourePack Menu
-Added ModsList Sorting By Recent
-Filter Categories Is Now Saved
+Fixed And Completed ResourePack Menu

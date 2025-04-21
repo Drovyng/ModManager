@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace ModManager.Content
 {
@@ -25,6 +26,7 @@ namespace ModManager.Content
             if (text == null) return;
             var t = text.ToString();
             if (t == "") return;
+            t = Utils.CleanChatTags(t);
             for (int i = 1; i < t.Length; i++)
             {
                 if (f.MeasureString(t.Substring(0, i) + Dots).X * scale > c.Width)

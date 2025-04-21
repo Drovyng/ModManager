@@ -1,22 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using ModManager.Content.ModsList;
-using ReLogic.Content;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System;
-using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.Localization;
-using Terraria.ModLoader.Core;
-using Terraria.ModLoader.UI;
-using Terraria.ModLoader;
-using Terraria.Social.Base;
-using Terraria.UI;
-using Terraria;
 using Terraria.IO;
 
 namespace ModManager.Content.ResourcePackSelection
@@ -114,6 +99,7 @@ namespace ModManager.Content.ResourcePackSelection
                 Set(null);
                 UIResourcePackSelectionMenuNew.Instance.ToRedo.Clear();
                 UIResourcePackSelectionMenuNew.Instance.ToUndo.Add((this, prev));
+                UIResourcePackSelectionMenuNew.Instance.UpdateDisplayerToSort();
             };
 
             Redesign();

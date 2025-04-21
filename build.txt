@@ -1,6 +1,6 @@
 displayName = Mod Manager Beta
 author = Drovyng
-version = 1.3.2.1
+version = 1.3.3.2
 side = Client
 homepage = https://github.com/Drovyng/ModManager
 sortBefore = ConciseModList, SmartModManagement, ModSideIcon, CompactMods, ModFolder
