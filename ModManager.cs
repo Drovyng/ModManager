@@ -1,11 +1,17 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ModManager.Content;
 using ModManager.Content.ModsBrowser;
 using ModManager.Content.ModsList;
 using ModManager.Content.ResourcePackSelection;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
+using MonoMod.RuntimeDetour.HookGen;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -91,6 +97,38 @@ namespace ModManager
                 Interface.loadMods.OnUpdate += LoadMods_OnUpdate;
             }
             On_Main.OpenResourcePacksMenu += On_Main_OpenResourcePacksMenu;
+        }
+        private Mod CompatChecker;
+        private MethodInfo CompatCheckerDrawVersionNumber;
+        public override void PostSetupContent()
+        {
+            if (ModLoader.TryGetMod("CompatChecker", out CompatChecker))
+            {
+                var hooks = typeof(HookEndpointManager).GetField(
+                    "Hooks", 
+                    BindingFlags.Static | BindingFlags.NonPublic
+                ).GetValue(null) as ConcurrentDictionary<(MethodBase, Delegate), Hook>;
+                var b = typeof(Main).GetMethod("DrawVersionNumber", BindingFlags.Static | BindingFlags.NonPublic);
+                foreach (var hook in hooks.ToList())
+                {
+                    if (hook.Key.Item1 == b)
+                    {
+                        hook.Value.Undo();
+                        hooks.TryRemove(hook);
+                    }
+                }
+                CompatCheckerDrawVersionNumber = CompatChecker.GetType().GetMethod("MainDrawVersionNumber_Detour", BindingFlags.Instance | BindingFlags.NonPublic);
+                On_Main.DrawVersionNumber += On_Main_DrawVersionNumber;
+            }
+        }
+        private void On_Main_DrawVersionNumber(On_Main.orig_DrawVersionNumber orig, Color menuColor, float upBump)
+        {
+            if (Main.menuMode != 888 || Main.MenuUI._currentState != Interface.modsMenu)
+            {
+                CompatCheckerDrawVersionNumber.Invoke(CompatChecker, [orig, menuColor, upBump]);
+                return;
+            }
+            orig(menuColor, upBump);
         }
 
         private void On_Main_OpenResourcePacksMenu(On_Main.orig_OpenResourcePacksMenu orig, Terraria.UI.UIState uiStateToGoBackTo)

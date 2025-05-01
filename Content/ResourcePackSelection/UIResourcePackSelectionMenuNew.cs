@@ -16,13 +16,16 @@ using Terraria.UI;
 
 namespace ModManager.Content.ResourcePackSelection
 {
-    public class UIResourcePackSelectionMenuNew : UIResourcePackSelectionMenu
+    public class UIResourcePackSelectionMenuNew : UIState
     {
         public static UIResourcePackSelectionMenuNew Instance;
 
         public float scale = DataConfigBrowser.Instance.Scale;
         public float scaleText = DataConfigBrowser.Instance.ScaleText;
         public float scaleThreshold = DataConfigBrowser.Instance.ScaleThreshold;
+
+        private AssetSourceController _sourceController;
+        private ResourcePackList _packsList;
 
         public UIPanelSizeable root;
 
@@ -55,9 +58,11 @@ namespace ModManager.Content.ResourcePackSelection
         {
             "", "Name", "Author", "Date"
         };
-        public UIResourcePackSelectionMenuNew(UIState uiStateToGoBackTo, AssetSourceController sourceController, ResourcePackList currentResourcePackList) : base(uiStateToGoBackTo, sourceController, currentResourcePackList)
+        public UIResourcePackSelectionMenuNew(UIState uiStateToGoBackTo, AssetSourceController sourceController, ResourcePackList currentResourcePackList)
         {
             Instance = this;
+            _sourceController = sourceController;
+            _packsList = currentResourcePackList;
         }
         public override void OnInitialize()
         {
@@ -361,6 +366,14 @@ namespace ModManager.Content.ResourcePackSelection
                 uIResourcePacksSorted.Add(new UIResourcePackToSort(item));
             }
             UpdateDisplayed();
+            foreach (var item in uIResourcePacks)
+            {
+                if (!item.pack.IsEnabled) continue;
+                item.loaded = true;
+                item.Set(true);
+            }
+            ToRedo.Clear();
+            ToUndo.Clear();
         }
         public void UpdateDisplayed()
         {
@@ -425,6 +438,7 @@ namespace ModManager.Content.ResourcePackSelection
 
                     if (pos.X + pack.GetOuterDimensions().Width / c.Width > 1)
                     {
+                        pos.Y += pack.GetOuterDimensions().Height;
                         pos.Y += pack.GetOuterDimensions().Height;
                         pack.Left.Precent = 0;
                         pos.X = add;
@@ -500,7 +514,7 @@ namespace ModManager.Content.ResourcePackSelection
                     Width = { Precent = 1f, Pixels = -8 },
                     Height = { Precent = 1f },
                     Top = { Pixels = 4 },
-                    color = Color.Black,
+                    color = UIColors.ColorBorderStatic,
                     align = 1f,
                     scale = 1f,
                     text = FilterCategory == j - 1 ? UIModsNew.Filters[FilterCategoryType] : UIModsNew.Filters[2]
@@ -528,6 +542,12 @@ namespace ModManager.Content.ResourcePackSelection
         }
         public override void Update(GameTime gameTime)
         {
+            if (Main.keyState.IsKeyDown(Keys.Escape))
+            {
+                Main.MenuUI.GoBack();
+                return;
+            }
+
             base.Update(gameTime);
 
             if (Main.keyState.PressingControl())

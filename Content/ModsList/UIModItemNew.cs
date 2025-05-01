@@ -135,7 +135,7 @@ namespace ModManager.Content.ModsList
                 divider1 = new(TextureAssets.MagicPixel)
                 {
                     OverrideSamplerState = SamplerState.PointClamp,
-                    Color = new Color(0, 0, 0, 0.5f),
+                    Color = UIColors.ColorBorderStatic * 0.75f,
                     Height = { Precent = 1 },
                     Width = { Pixels = 4 },
                     ScaleToFit = true
@@ -144,7 +144,7 @@ namespace ModManager.Content.ModsList
                 divider2 = new(TextureAssets.MagicPixel)
                 {
                     OverrideSamplerState = SamplerState.PointClamp,
-                    Color = new Color(0, 0, 0, 0.5f),
+                    Color = UIColors.ColorBorderStatic * 0.75f,
                     Height = { Precent = 1 },
                     Width = { Pixels = 4 },
                     ScaleToFit = true
@@ -153,7 +153,7 @@ namespace ModManager.Content.ModsList
                 divider3 = new(TextureAssets.MagicPixel)
                 {
                     OverrideSamplerState = SamplerState.PointClamp,
-                    Color = new Color(0, 0, 0, 0.5f),
+                    Color = UIColors.ColorBorderStatic * 0.75f,
                     Height = { Precent = 1 },
                     Width = { Pixels = 4 },
                     ScaleToFit = true

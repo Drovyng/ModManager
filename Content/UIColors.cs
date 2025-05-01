@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
 namespace ModManager.Content
 {
@@ -51,12 +46,30 @@ namespace ModManager.Content
             ColorBorderAllowDrop = new Color(0, 255, 0) * 0.75f;
             ColorBorderAllowDropHovered = new Color(255, 255, 220) * 0.75f;
 
-            ColorBackgroundDisabled = new Color(128, 64, 128) * 0.175f;
-            ColorBackgroundStatic = new Color(128, 128, 128) * 0.175f;
-            ColorBackgroundHovered = new Color(192, 192, 192) * 0.175f;
-            ColorBackgroundSelected = new Color(255, 255, 255) * 0.2f;
+            ColorBackgroundDisabled = new Color(170, 64, 170) * 0.35f;
+            ColorBackgroundStatic = new Color(128, 128, 128) * 0.35f;
+            ColorBackgroundHovered = new Color(192, 192, 192) * 0.35f;
+            ColorBackgroundSelected = new Color(255, 255, 255) * 0.5f;
 
             ColorNeedUpdate = new Color(64, 192, 192) * 0.55f;
+
+            ColorInvert = Color.Gray;
+            ColorSliders = Color.White;
+        }
+        public static void SetDark()
+        {
+            ColorBorderStatic = new Color(150, 150, 150);
+            ColorBorderHovered = new Color(255, 215, 0);
+
+            ColorBorderAllowDrop = new Color(0, 255, 0);
+            ColorBorderAllowDropHovered = new Color(255, 255, 220);
+
+            ColorBackgroundDisabled = new Color(128, 8, 128) * 0.6f;
+            ColorBackgroundStatic = new Color(8, 8, 8) * 0.6f;
+            ColorBackgroundHovered = new Color(24, 24, 24) * 0.6f;
+            ColorBackgroundSelected = new Color(48, 48, 48) * 0.8f;
+
+            ColorNeedUpdate = new Color(0, 128, 128) * 0.75f;
 
             ColorInvert = Color.Gray;
             ColorSliders = Color.White;
@@ -67,6 +80,9 @@ namespace ModManager.Content
             {
                 case ManagerConfigTheme.Light:
                     SetLight();
+                    return;
+                case ManagerConfigTheme.Dark:
+                    SetDark();
                     return;
                 default:
                     SetBlue();

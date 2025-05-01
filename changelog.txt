@@ -1,1 +1,2 @@
-Fixed And Completed ResourePack Menu
+Added Dark Mode
+Removed Compatibility Checker Overlay In Mods Menu

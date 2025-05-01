@@ -7,7 +7,9 @@ namespace ModManager.Content
     public enum ManagerConfigTheme : byte
     {
         Blue,
-        Light
+        Light,
+        Dark//,
+        //Custom
     }
     public class ManagerConfig : ModConfig
     {

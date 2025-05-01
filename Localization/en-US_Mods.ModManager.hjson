@@ -120,10 +120,12 @@ Configs: {
 		Tooltip: ""
 		Blue.Label: Blue
 		Light.Label: Light
+		Dark.Label: Dark
+		Custom.Label: Custom
 	}
 
 	DataConfigResourcePack: {
-		DisplayName: Data Config Resource Pack
+		DisplayName: Data 3
 
 		RootSize: {
 			Label: Root Size

@@ -29,7 +29,7 @@ namespace ModManager.Content.ModsList
                 Width = { Precent = 1f, Pixels = -8 },
                 Height = { Precent = 1f },
                 Top = { Pixels = 4 },
-                color = Color.Black,
+                color = UIColors.ColorBorderStatic,
                 align = 1f,
                 scale = 1f,
             };
