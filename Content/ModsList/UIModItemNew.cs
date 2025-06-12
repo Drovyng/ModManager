@@ -25,6 +25,23 @@ namespace ModManager.Content.ModsList
         public LocalMod mod;
         public bool loaded;
 
+        public bool Locked
+        {
+            get
+            {
+                if (mod == null) return false;
+                if (cantUseText != null) return true;
+                return DataConfig.Instance.LockedMods.Contains(mod.Name);
+            }
+            set
+            {
+                if (value && !DataConfig.Instance.LockedMods.Contains(mod.Name))
+                    DataConfig.Instance.LockedMods.Add(mod.Name);
+                else if (!value && DataConfig.Instance.LockedMods.Contains(mod.Name))
+                    DataConfig.Instance.LockedMods.Remove(mod.Name);
+            }
+        }
+
         public UIImage icon;
         public UITextDots<string> textName;
         public UITextDots<string> textAuthor;
@@ -36,6 +53,7 @@ namespace ModManager.Content.ModsList
         public UIImage divider3;
 
         public UIImage toggle;
+        public UIImage toggleLock;
 
         public UIPanelStyled cantUse;
         public UITextLines cantUseText;
@@ -269,9 +287,19 @@ namespace ModManager.Content.ModsList
                 {
                     ImageScale = 0.75f,
                     NormalizedOrigin = Vector2.One * 0.5f,
-                    Color = mod.Enabled ? new Color(0.75f, 1f, 0.75f) : Color.White
+                    Color = mod.Enabled ? new Color(0.75f, 1f, 0.75f) : Color.White,
+                    OverrideSamplerState = SamplerState.PointClamp
                 };
                 Append(toggle);
+                toggleLock = new(ModManager.AssetToggleLock)
+                {
+                    ImageScale = 0.75f,
+                    NormalizedOrigin = Vector2.One * 0.5f,
+                    OverrideSamplerState = SamplerState.PointClamp,
+                    IgnoresMouseInteraction = true
+                };
+                toggleLock.Color = Locked ? Color.White : Color.Transparent;
+                toggle.Append(toggleLock);
 
                 string text2 = null;
                 string updateURL = "https://github.com/tModLoader/tModLoader/wiki/tModLoader-guide-for-players#beta-branches";
@@ -321,6 +349,8 @@ namespace ModManager.Content.ModsList
                         Top = { Pixels = 4 }
                     };
                     cantUse.Append(cantUseText);
+                    toggleLock.Color = Color.White;
+                    Locked = true;
                 }
                 else
                 {
@@ -332,6 +362,10 @@ namespace ModManager.Content.ModsList
             }
             Redesign();
         }
+        public override void MiddleClick(UIMouseEvent evt)
+        {
+            if (cantUseText == null) Lock();
+        }
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (UIModsNew.Instance.SelectedItems.Contains(this) && UIModsNew.Instance.GrabbedItem)
@@ -342,10 +376,53 @@ namespace ModManager.Content.ModsList
             }
             base.Draw(spriteBatch);
         }
+        public void Lock(bool? enabled = null, bool check = true)
+        {
+            enabled ??= !Locked;
+            Locked = enabled.Value;
+            toggleLock.Color = enabled.Value ? Color.White : Color.Transparent;
+            if (enabled == true)
+            {
+                var l = References.ToList();
+                foreach (var item in UIModsNew.Instance.uIMods)
+                {
+                    if (item.mod != null && l.Contains(item.mod.Name))
+                    {
+                        if (item.cantUseText == null)
+                        {
+                            item.Lock(true, false);
+                        }
+                        l.Remove(item.mod.Name);
+                    }
+                }
+            }
+            else
+            {
+                var need = new List<string>();
+                foreach (var item in UIModsNew.Instance.uIMods)
+                {
+                    if (check && item.mod != null && item.References.Contains(mod.Name))
+                    {
+                        item.Lock(false, false);
+                    }
+                    else if (item.mod != null && item.mod.Enabled && item != this)
+                    {
+                        need.AddRange(item.References);
+                    }
+                }
+                foreach (var item in UIModsNew.Instance.uIMods)
+                {
+                    if (item.mod != null && References.Contains(item.mod.Name) && !need.Contains(item.mod.Name))
+                    {
+                        item.Lock(false, false);
+                    }
+                }
+            }
+        }
         public void Set(bool? enabled = null, bool check = true, bool doNotCheckIAmPro = false)
         {
-            if (mod == null || cantUseText != null) return;
-
+            if (mod == null || cantUseText != null || (!doNotCheckIAmPro && Locked)) return;
+            Locked = false;
             enabled ??= !mod.Enabled;
 
             IEnumerable<UIModItemNew> savedList = null;
@@ -431,7 +508,7 @@ namespace ModManager.Content.ModsList
         {
             float scale = UIModsNew.Instance.scale;
             float scaleText = UIModsNew.Instance.scaleText;
-            bool grid = scale >= UIModsNew.Instance.scaleThreshold;
+            bool grid = UIModsNew.Instance.scaleGrid;
             var e = UIModsNew.Instance.categoriesHorizontal.Elements;
 
             icon.Height = icon.Width = new(32 * scale - 6, 0);
@@ -551,6 +628,7 @@ namespace ModManager.Content.ModsList
                 UIModsNew.Instance.OpenedPath.Add(Name);
                 UIModsNew.Instance.RecalculatePath();
             }
+            else Set();
         }
         public override void LeftMouseDown(UIMouseEvent evt)
         {
@@ -625,6 +703,7 @@ namespace ModManager.Content.ModsList
                     else
                     {
                         if (!path.StartsWith("/")) path = "/" + path;
+                        path = path.Replace("//", "/").Replace("//", "/").Replace("//", "/");
 
                         UIModsNew.Instance.ToRedo.Clear();
                         UIModsNew.Instance.ToUndo.Add((UIModsNew.UndoRedoEnum.Move, (DataConfig.Instance.ModPaths.ToDictionary(), DataConfig.Instance.Folders.ToList())));
@@ -640,8 +719,8 @@ namespace ModManager.Content.ModsList
                                 var vls = DataConfig.Instance.ModPaths.ToList();
                                 foreach (var item in vls)
                                 {
-                                    if (item.Value == curPath) DataConfig.Instance.ModPaths[item.Key] = path.Replace("//", "/");
-                                    else if (item.Value.StartsWith(curPath)) DataConfig.Instance.ModPaths[item.Key] = (path + item.Value.Substring(curPath.Length)).Replace("//", "/");
+                                    if (item.Value == curPath) DataConfig.Instance.ModPaths[item.Key] = path.Replace("//", "/").Replace("//", "/");
+                                    else if (item.Value.StartsWith(curPath)) DataConfig.Instance.ModPaths[item.Key] = (path + item.Value.Substring(curPath.Length)).Replace("//", "/").Replace("//", "/");
                                 }
                                 var vls2 = DataConfig.Instance.Folders.ToList();
                                 foreach (var item in vls2)
@@ -649,12 +728,12 @@ namespace ModManager.Content.ModsList
                                     if (item == curPath)
                                     {
                                         DataConfig.Instance.Folders.Remove(item);
-                                        DataConfig.Instance.Folders.Add(path.Replace("//", "/"));
+                                        DataConfig.Instance.Folders.Add(path.Replace("//", "/").Replace("//", "/"));
                                     }
                                     else if (item.StartsWith(curPath))
                                     {
                                         DataConfig.Instance.Folders.Remove(item);
-                                        DataConfig.Instance.Folders.Add((path + item.Substring(curPath.Length)).Replace("//", "/"));
+                                        DataConfig.Instance.Folders.Add((path + item.Substring(curPath.Length)).Replace("//", "/").Replace("//", "/"));
                                     }
                                 }
                             }

@@ -35,6 +35,7 @@ namespace ModManager
         public static Asset<Texture2D> AssetToggleOn;
         public static Asset<Texture2D> AssetToggleHalf;
         public static Asset<Texture2D> AssetToggleOff;
+        public static Asset<Texture2D> AssetToggleLock;
         public static Asset<Texture2D> AssetLoading;
         public static Asset<Texture2D> AssetSizeCursor;
         public static Asset<Texture2D> AssetSizeCursorBG;
@@ -76,6 +77,7 @@ namespace ModManager
             AssetToggleOn = Assets.Request<Texture2D>("Assets/ToggleOn", AssetRequestMode.ImmediateLoad);
             AssetToggleHalf = Assets.Request<Texture2D>("Assets/ToggleHalf", AssetRequestMode.ImmediateLoad);
             AssetToggleOff = Assets.Request<Texture2D>("Assets/ToggleOff", AssetRequestMode.ImmediateLoad);
+            AssetToggleLock = Assets.Request<Texture2D>("Assets/ToggleLock", AssetRequestMode.ImmediateLoad);
             AssetLoading = Assets.Request<Texture2D>("Assets/Loading", AssetRequestMode.ImmediateLoad);
             AssetSizeCursor = Assets.Request<Texture2D>("Assets/SizeCursor", AssetRequestMode.ImmediateLoad);
             AssetSizeCursorBG = Assets.Request<Texture2D>("Assets/SizeCursorBG", AssetRequestMode.ImmediateLoad);

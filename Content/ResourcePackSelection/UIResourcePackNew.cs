@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent;
 using Terraria.IO;
+using Terraria.UI;
 
 namespace ModManager.Content.ResourcePackSelection
 {
@@ -104,6 +105,14 @@ namespace ModManager.Content.ResourcePackSelection
 
             Redesign();
         }
+        public override void LeftDoubleClick(UIMouseEvent evt)
+        {
+            var prev = pack.IsEnabled;
+            Set(null);
+            UIResourcePackSelectionMenuNew.Instance.ToRedo.Clear();
+            UIResourcePackSelectionMenuNew.Instance.ToUndo.Add((this, prev));
+            UIResourcePackSelectionMenuNew.Instance.UpdateDisplayerToSort();
+        }
         public void Set(bool? enabled = null)
         {
             if (pack == null) return;
@@ -119,7 +128,7 @@ namespace ModManager.Content.ResourcePackSelection
         {
             float scale = UIResourcePackSelectionMenuNew.Instance.scale;
             float scaleText = UIResourcePackSelectionMenuNew.Instance.scaleText;
-            bool grid = scale >= UIResourcePackSelectionMenuNew.Instance.scaleThreshold;
+            bool grid = UIResourcePackSelectionMenuNew.Instance.scaleGrid;
             var e = UIResourcePackSelectionMenuNew.Instance.categoriesHorizontal.Elements;
 
             icon.Height = icon.Width = new(32 * scale - 6, 0);

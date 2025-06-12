@@ -7,6 +7,7 @@ namespace ModManager.Content.ModsList
 {
     public class UIAlphaFixer : UIElement
     {
+        /*
         public override void Draw(SpriteBatch spriteBatch)
         {
             return;
@@ -24,5 +25,6 @@ namespace ModManager.Content.ModsList
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, anisotropicClamp, DepthStencilState.None, OverflowHiddenRasterizerState, null, Main.UIScaleMatrix);
             }
         }
+        */
     }
 }

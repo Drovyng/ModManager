@@ -8,8 +8,8 @@ namespace ModManager.Content
     {
         Blue,
         Light,
-        Dark//,
-        //Custom
+        Dark,
+        Custom
     }
     public class ManagerConfig : ModConfig
     {

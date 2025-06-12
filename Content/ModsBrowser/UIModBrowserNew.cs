@@ -35,7 +35,7 @@ namespace ModManager.Content.ModsBrowser
 
         public float scale = DataConfigBrowser.Instance.Scale;
         public float scaleText = DataConfigBrowser.Instance.ScaleText;
-        public float scaleThreshold = DataConfigBrowser.Instance.ScaleThreshold;
+        public bool scaleGrid = DataConfigBrowser.Instance.ScaleGrid;
 
         public UIPanelSizeable root;
 
@@ -213,6 +213,7 @@ namespace ModManager.Content.ModsBrowser
                     maximum = 6,
                     value = DataConfig.Instance.Scale
                 };
+
                 var labelTextScale = new UITextDots<LocalizedText>()
                 {
                     Width = { Precent = 0.45f },
@@ -229,30 +230,51 @@ namespace ModManager.Content.ModsBrowser
                     maximum = 1.5f,
                     value = DataConfig.Instance.ScaleText
                 };
-                var labelThresholdScale = new UITextDots<LocalizedText>()
+
+                var labelGridScale = new UITextDots<LocalizedText>()
                 {
                     Width = { Precent = 0.45f },
                     Top = { Pixels = 54 },
                     Height = { Pixels = 16 },
-                    text = ModManager.Get("S_Threshold")
+                    text = ModManager.Get("ViewStyle")
                 };
-                var sliderThresholdScale = new UISliderNew()
+                var buttonListScale = new UIPanelStyled()
                 {
-                    Width = { Precent = 0.55f },
+                    Width = { Precent = 0.275f },
                     Left = { Precent = 0.45f },
                     Top = { Pixels = 50 },
-                    minimum = 1,
-                    maximum = 6,
-                    value = DataConfig.Instance.ScaleThreshold
-                };
+                    Height = { Pixels = 20 },
+                }.FadedMouseOver();
+                buttonListScale.OnLeftClick += delegate { scaleGrid = false; Redesign(); };
+                buttonListScale.OnUpdate += delegate { buttonListScale.BorderColor = scaleGrid ? UIColors.ColorBorderStatic : UIColors.ColorBorderHovered; };
+                buttonListScale.Append(new UITextDots<LocalizedText>()
+                {
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    align = 0.5f,
+                    Top = { Pixels = 2 },
+                    text = ModManager.Get("ViewList")
+                });
+                var buttonGridScale = new UIPanelStyled()
+                {
+                    Width = { Precent = 0.275f },
+                    Left = { Precent = 0.725f },
+                    Top = { Pixels = 50 },
+                    Height = { Pixels = 20 },
+                }.FadedMouseOver();
+                buttonGridScale.OnLeftClick += delegate { scaleGrid = true; Redesign(); };
+                buttonGridScale.OnUpdate += delegate { buttonGridScale.BorderColor = scaleGrid ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic; };
+                buttonGridScale.Append(new UITextDots<LocalizedText>()
+                {
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    align = 0.5f,
+                    Top = { Pixels = 2 },
+                    text = ModManager.Get("ViewGrid")
+                });
                 sliderScale.OnChange += () =>
                 {
                     scale = sliderScale.value;
-                    Redesign();
-                };
-                sliderThresholdScale.OnChange += () =>
-                {
-                    scaleThreshold = sliderThresholdScale.value;
                     Redesign();
                 };
                 sliderTextScale.OnChange += () =>
@@ -264,8 +286,9 @@ namespace ModManager.Content.ModsBrowser
                 ontopSettings.Append(sliderScale);
                 ontopSettings.Append(labelTextScale);
                 ontopSettings.Append(sliderTextScale);
-                ontopSettings.Append(labelThresholdScale);
-                ontopSettings.Append(sliderThresholdScale);
+                ontopSettings.Append(labelGridScale);
+                ontopSettings.Append(buttonListScale);
+                ontopSettings.Append(buttonGridScale);
                 topPanel.Append(ontopSettings);
             }
             void NeedUpdate() { needUpdate = true; }
@@ -526,7 +549,7 @@ namespace ModManager.Content.ModsBrowser
             }
 
             cfg.Scale = scale;
-            cfg.ScaleThreshold = scaleThreshold;
+            cfg.ScaleGrid = scaleGrid;
             cfg.ScaleText = scaleText;
 
             cfg.Save();
@@ -544,7 +567,6 @@ namespace ModManager.Content.ModsBrowser
         }
         public void Redesign()
         {
-            var grid = scale >= scaleThreshold;
             var pos = Vector2.Zero;
             var c = mainList.GetInnerDimensions();
             float addGridHeight = 0;
@@ -552,7 +574,7 @@ namespace ModManager.Content.ModsBrowser
             {
                 var mod = item as UIModBrowserItemNew;
                 mod.Redesign();
-                if (grid)
+                if (scaleGrid)
                 {
                     float add = 1f / (int)(c.Width / mod.GetOuterDimensions().Width);
                     if (pos.X + mod.GetOuterDimensions().Width / c.Width > 1)
@@ -572,9 +594,9 @@ namespace ModManager.Content.ModsBrowser
                 else mod.Left.Precent = 0;
                 mod.Left.Pixels = 0;
                 mod.Top.Pixels = pos.Y;
-                if (!grid) pos.Y += mod.GetOuterDimensions().Height;
+                if (!scaleGrid) pos.Y += mod.GetOuterDimensions().Height;
             }
-            if (grid) pos.Y += addGridHeight;
+            if (scaleGrid) pos.Y += addGridHeight;
             pos.Y = MathF.Max(pos.Y, c.Height);
             mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();

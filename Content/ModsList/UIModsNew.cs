@@ -24,7 +24,7 @@ namespace ModManager.Content.ModsList
     {
         public static UIModsNew Instance => Interface.modsMenu as UIModsNew;
 
-        public float scaleThreshold = DataConfig.Instance.ScaleThreshold;
+        public bool scaleGrid = DataConfig.Instance.ScaleGrid;
         public float scale = DataConfig.Instance.Scale;
         public float scaleText = DataConfig.Instance.ScaleText;
 
@@ -183,17 +183,25 @@ namespace ModManager.Content.ModsList
             }
             DataConfig.Instance.Folders.Add(new_path);
         }
-        public void ActDelete()
+        public void ActDelete(UIModItemNew i = null)
         {
-            if (SelectedItem == null) return;
-            if (SelectedItem.mod != null)
+            if (i == null)
             {
-                uIMods.Remove(SelectedItem);
-                ModOrganizer.DeleteMod(SelectedItem.mod);
+                foreach (var item in SelectedItems)
+                {
+                    ActDelete(item);
+                }
+                return;
+            }
+
+            if (i.mod != null)
+            {
+                uIMods.Remove(i);
+                ModOrganizer.DeleteMod(i.mod);
             }
             else
             {
-                var name = SelectedItem.Name;
+                var name = i.Name;
                 var path = string.Join("/", OpenedPath) + "/" + name; if (!path.StartsWith("/")) path = "/" + path;
                 var new_path = string.Join("/", OpenedPath); if (!new_path.StartsWith("/")) new_path = "/" + new_path;
                 DataConfig.Instance.Folders.Remove(path);
@@ -402,7 +410,7 @@ namespace ModManager.Content.ModsList
             Append(popupRename);
 
             popupSureDelete = new();
-            popupSureDelete.OnApply = ActDelete;
+            popupSureDelete.OnApply = delegate { ActDelete(); };
             Append(popupSureDelete);
 
             root.OnRightClick += Root_OnRightClick;
@@ -673,30 +681,51 @@ namespace ModManager.Content.ModsList
                     maximum = 1.5f,
                     value = DataConfig.Instance.ScaleText
                 };
-                var labelThresholdScale = new UITextDots<string>()
+
+                var labelGridScale = new UITextDots<LocalizedText>()
                 {
                     Width = { Precent = 0.45f },
                     Top = { Pixels = 54 },
                     Height = { Pixels = 16 },
-                    text = "Threshold"
+                    text = ModManager.Get("ViewStyle")
                 };
-                var sliderThresholdScale = new UISliderNew()
+                var buttonListScale = new UIPanelStyled()
                 {
-                    Width = { Precent = 0.55f },
+                    Width = { Precent = 0.275f },
                     Left = { Precent = 0.45f },
                     Top = { Pixels = 50 },
-                    minimum = 1,
-                    maximum = 6,
-                    value = DataConfig.Instance.ScaleThreshold
-                };
+                    Height = { Pixels = 20 },
+                }.FadedMouseOver();
+                buttonListScale.OnLeftClick += delegate { scaleGrid = false; RedesignUIMods(); };
+                buttonListScale.OnUpdate += delegate { buttonListScale.BorderColor = scaleGrid ? UIColors.ColorBorderStatic : UIColors.ColorBorderHovered; };
+                buttonListScale.Append(new UITextDots<LocalizedText>()
+                {
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    align = 0.5f,
+                    Top = { Pixels = 2 },
+                    text = ModManager.Get("ViewList")
+                });
+                var buttonGridScale = new UIPanelStyled()
+                {
+                    Width = { Precent = 0.275f },
+                    Left = { Precent = 0.725f },
+                    Top = { Pixels = 50 },
+                    Height = { Pixels = 20 },
+                }.FadedMouseOver();
+                buttonGridScale.OnLeftClick += delegate { scaleGrid = true; RedesignUIMods(); };
+                buttonGridScale.OnUpdate += delegate { buttonGridScale.BorderColor = scaleGrid ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic; };
+                buttonGridScale.Append(new UITextDots<LocalizedText>()
+                {
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    align = 0.5f,
+                    Top = { Pixels = 2 },
+                    text = ModManager.Get("ViewGrid")
+                });
                 sliderScale.OnChange += () =>
                 {
                     scale = sliderScale.value;
-                    RedesignUIMods();
-                };
-                sliderThresholdScale.OnChange += () =>
-                {
-                    scaleThreshold = sliderThresholdScale.value;
                     RedesignUIMods();
                 };
                 sliderTextScale.OnChange += () =>
@@ -708,8 +737,9 @@ namespace ModManager.Content.ModsList
                 ontopSettings.Append(sliderScale);
                 ontopSettings.Append(labelTextScale);
                 ontopSettings.Append(sliderTextScale);
-                ontopSettings.Append(labelThresholdScale);
-                ontopSettings.Append(sliderThresholdScale);
+                ontopSettings.Append(labelGridScale);
+                ontopSettings.Append(buttonListScale);
+                ontopSettings.Append(buttonGridScale);
                 topPanel.Append(ontopSettings);
             }
             {
@@ -1151,7 +1181,6 @@ namespace ModManager.Content.ModsList
         }
         public void RedesignUIMods()
         {
-            var grid = scale >= scaleThreshold;
             var pos = Vector2.Zero;
             var c = mainList.GetInnerDimensions();
             float addGridHeight = 0;
@@ -1160,7 +1189,7 @@ namespace ModManager.Content.ModsList
                 var mod = item as UIModItemNew;
                 if (!mod.Active) continue;
                 mod.Redesign();
-                if (grid)
+                if (scaleGrid)
                 {
                     float add = 1f / (int)(c.Width / mod.GetOuterDimensions().Width);
 
@@ -1181,9 +1210,9 @@ namespace ModManager.Content.ModsList
                 else mod.Left.Precent = 0;
                 mod.Left.Pixels = 0;
                 mod.Top.Pixels = pos.Y;
-                if (!grid) pos.Y += mod.GetOuterDimensions().Height;
+                if (!scaleGrid) pos.Y += mod.GetOuterDimensions().Height;
             }
-            if (grid) pos.Y += addGridHeight;
+            if (scaleGrid) pos.Y += addGridHeight;
             pos.Y = MathF.Max(pos.Y, c.Height);
             mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();
@@ -1503,7 +1532,7 @@ namespace ModManager.Content.ModsList
             cfg.CollectionsSize = (int)collections.Width.Pixels;
 
             cfg.Scale = scale;
-            cfg.ScaleThreshold = scaleThreshold;
+            cfg.ScaleGrid = scaleGrid;
             cfg.ScaleText = scaleText;
 
             cfg.FilterCategory = FilterCategory;

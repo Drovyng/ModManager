@@ -71,6 +71,16 @@ Configs: {
 			// Label: Filter Category Type
 			// Tooltip: ""
 		}
+
+		ScaleGrid: {
+			// Label: Scale Grid
+			// Tooltip: ""
+		}
+
+		LockedMods: {
+			// Label: Locked Mods
+			// Tooltip: ""
+		}
 	}
 
 	DataConfigBrowser: {
@@ -100,6 +110,11 @@ Configs: {
 			// Label: Scale Threshold
 			// Tooltip: ""
 		}
+
+		ScaleGrid: {
+			// Label: Scale Grid
+			// Tooltip: ""
+		}
 	}
 
 	ManagerConfig: {
@@ -121,7 +136,7 @@ Configs: {
 		Blue.Label: Синяя
 		Light.Label: Светлая
 		Dark.Label: Тёмная
-		// Custom.Label: Custom
+		Custom.Label: Кастомная
 	}
 
 	DataConfigResourcePack: {
@@ -151,6 +166,70 @@ Configs: {
 			// Label: Scale Threshold
 			// Tooltip: ""
 		}
+
+		ScaleGrid: {
+			// Label: Scale Grid
+			// Tooltip: ""
+		}
+	}
+
+	ColorConfig: {
+		DisplayName: Конфиг Цветов
+
+		ColorBorderStatic: {
+			Label: Обводка
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorBorderHovered: {
+			Label: Обводка (При Наведении)
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorBorderAllowDrop: {
+			Label: Обводка Для Перетаскивания
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorBorderAllowDropHovered: {
+			Label: Обводка Для Перетаскивания (При Наведении)
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorBackgroundDisabled: {
+			Label: Фон (Выключенный)
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorBackgroundStatic: {
+			Label: Фон
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorBackgroundHovered: {
+			Label: Фон (При Наведении)
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorBackgroundSelected: {
+			Label: Фон (Выделенный)
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorNeedUpdate: {
+			Label: Требуется Обновление
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorInvert: {
+			Label: Инвертированный
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
+
+		ColorSliders: {
+			Label: Ползунки
+			Tooltip: Работает только при выбранной КАСТОМНОЙ цветовой теме
+		}
 	}
 }
 
@@ -161,7 +240,12 @@ RenameTitle: Переименование
 Cancel: Отмена
 Delete: Удалить
 Remove: Убрать
+Lock: Заблокировать
+Unlock: Разблокировать
 Info: Информация
+ViewList: Лист
+ViewGrid: Сетка
+ViewStyle: Стиль
 CantLeave: Пожалуйста Примените или Отклоните изменения беред выходом!
 DeleteDescMod: Вы можете скачать мод снова в Браузере Модов
 DeleteDescFolder: Все файлы будут перенесены в текущую директорию

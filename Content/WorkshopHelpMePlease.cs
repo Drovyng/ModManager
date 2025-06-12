@@ -30,7 +30,6 @@ namespace ModManager.Content
         {
             modsNeedUpdateLoading = true;
             modsNeedUpdate.Clear();
-            int c = 0;
             try
             {
                 List<ModDownloadItem> installedModDownloadItems = Interface.modBrowser.SocialBackend.GetInstalledModDownloadItems();

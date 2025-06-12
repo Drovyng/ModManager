@@ -151,6 +151,8 @@ namespace ModManager.Content.ModsBrowser
             flagsMarkers.Width.Pixels = -off;
 
             Redesign();
+
+            OnLeftDoubleClick += DownloadWithDeps;
         }
         public async void DownloadWithDeps(UIMouseEvent evt, UIElement listeningElement)
         {
@@ -169,7 +171,7 @@ namespace ModManager.Content.ModsBrowser
         {
             float scale = UIModBrowserNew.Instance.scale;
             float scaleText = UIModBrowserNew.Instance.scaleText;
-            bool grid = scale >= UIModBrowserNew.Instance.scaleThreshold;
+            bool grid = UIModBrowserNew.Instance.scaleGrid;
             var e = UIModBrowserNew.Instance.categoriesHorizontal.Elements;
 
             icon.Height = icon.Width = new(32 * scale - 6, 0);

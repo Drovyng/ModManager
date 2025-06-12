@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ModManager.Content.ModsList;
 using Terraria;
@@ -22,7 +23,10 @@ namespace ModManager.Content.ResourcePackSelection
 
         public float scale = DataConfigBrowser.Instance.Scale;
         public float scaleText = DataConfigBrowser.Instance.ScaleText;
-        public float scaleThreshold = DataConfigBrowser.Instance.ScaleThreshold;
+        public bool scaleGrid = DataConfigBrowser.Instance.ScaleGrid;
+
+        public UIResourcePackToSort grabbed;
+        public Vector2 grabbedPos;
 
         private AssetSourceController _sourceController;
         private ResourcePackList _packsList;
@@ -212,30 +216,51 @@ namespace ModManager.Content.ResourcePackSelection
                     maximum = 1.5f,
                     value = DataConfig.Instance.ScaleText
                 };
-                var labelThresholdScale = new UITextDots<LocalizedText>()
+
+                var labelGridScale = new UITextDots<LocalizedText>()
                 {
                     Width = { Precent = 0.45f },
                     Top = { Pixels = 54 },
                     Height = { Pixels = 16 },
-                    text = ModManager.Get("S_Threshold")
+                    text = ModManager.Get("ViewStyle")
                 };
-                var sliderThresholdScale = new UISliderNew()
+                var buttonListScale = new UIPanelStyled()
                 {
-                    Width = { Precent = 0.55f },
+                    Width = { Precent = 0.275f },
                     Left = { Precent = 0.45f },
                     Top = { Pixels = 50 },
-                    minimum = 1,
-                    maximum = 6,
-                    value = DataConfig.Instance.ScaleThreshold
-                };
+                    Height = { Pixels = 20 },
+                }.FadedMouseOver();
+                buttonListScale.OnLeftClick += delegate { scaleGrid = false; Redesign(); };
+                buttonListScale.OnUpdate += delegate { buttonListScale.BorderColor = scaleGrid ? UIColors.ColorBorderStatic : UIColors.ColorBorderHovered; };
+                buttonListScale.Append(new UITextDots<LocalizedText>()
+                {
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    align = 0.5f,
+                    Top = { Pixels = 2 },
+                    text = ModManager.Get("ViewList")
+                });
+                var buttonGridScale = new UIPanelStyled()
+                {
+                    Width = { Precent = 0.275f },
+                    Left = { Precent = 0.725f },
+                    Top = { Pixels = 50 },
+                    Height = { Pixels = 20 },
+                }.FadedMouseOver();
+                buttonGridScale.OnLeftClick += delegate { scaleGrid = true; Redesign(); };
+                buttonGridScale.OnUpdate += delegate { buttonGridScale.BorderColor = scaleGrid ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic; };
+                buttonGridScale.Append(new UITextDots<LocalizedText>()
+                {
+                    Width = { Precent = 1 },
+                    Height = { Precent = 1 },
+                    align = 0.5f,
+                    Top = { Pixels = 2 },
+                    text = ModManager.Get("ViewGrid")
+                });
                 sliderScale.OnChange += () =>
                 {
                     scale = sliderScale.value;
-                    Redesign();
-                };
-                sliderThresholdScale.OnChange += () =>
-                {
-                    scaleThreshold = sliderThresholdScale.value;
                     Redesign();
                 };
                 sliderTextScale.OnChange += () =>
@@ -247,8 +272,9 @@ namespace ModManager.Content.ResourcePackSelection
                 ontopSettings.Append(sliderScale);
                 ontopSettings.Append(labelTextScale);
                 ontopSettings.Append(sliderTextScale);
-                ontopSettings.Append(labelThresholdScale);
-                ontopSettings.Append(sliderThresholdScale);
+                ontopSettings.Append(labelGridScale);
+                ontopSettings.Append(buttonListScale);
+                ontopSettings.Append(buttonGridScale);
                 topPanel.Append(ontopSettings);
             }
             {
@@ -278,6 +304,7 @@ namespace ModManager.Content.ResourcePackSelection
                     {
                         item.Set(true);
                     }
+                    UpdateDisplayerToSort();
                 };
                 ontopButtons.Append(buttonEnableAll);
                 var buttonDisableAll = new UIPanelStyled()
@@ -301,6 +328,7 @@ namespace ModManager.Content.ResourcePackSelection
                     {
                         item.Set(false);
                     }
+                    UpdateDisplayerToSort();
                 };
                 ontopButtons.Append(buttonDisableAll);
                 var buttonApply = new UIPanelStyled()
@@ -424,7 +452,6 @@ namespace ModManager.Content.ResourcePackSelection
         }
         public void Redesign()
         {
-            var grid = scale >= scaleThreshold;
             var pos = Vector2.Zero;
             var c = mainList.GetInnerDimensions();
             float addGridHeight = 0;
@@ -432,7 +459,7 @@ namespace ModManager.Content.ResourcePackSelection
             {
                 var pack = item as UIResourcePackNew;
                 pack.Redesign();
-                if (grid)
+                if (scaleGrid)
                 {
                     float add = 1f / (int)(c.Width / pack.GetOuterDimensions().Width);
 
@@ -454,9 +481,9 @@ namespace ModManager.Content.ResourcePackSelection
                 else pack.Left.Precent = 0;
                 pack.Left.Pixels = 0;
                 pack.Top.Pixels = pos.Y;
-                if (!grid) pos.Y += pack.GetOuterDimensions().Height;
+                if (!scaleGrid) pos.Y += pack.GetOuterDimensions().Height;
             }
-            if (grid) pos.Y += addGridHeight;
+            if (scaleGrid) pos.Y += addGridHeight;
             pos.Y = MathF.Max(pos.Y, c.Height);
             mainListIn.Height.Pixels = pos.Y;
             mainList.Recalculate();
@@ -540,6 +567,26 @@ namespace ModManager.Content.ResourcePackSelection
             }
             categoriesHorizontal.Activate();
         }
+        public override void LeftMouseUp(UIMouseEvent evt)
+        {
+            if (grabbed == null) return;
+            if (sortList.IsMouseHovering)
+            {
+                var b = true;
+                foreach (var item in sortListIn.Elements)
+                {
+                    if (item._innerDimensions.Y + item._innerDimensions.Height * 0.5f >= Main.mouseY)
+                    {
+                        grabbed.pack.SortingOrder = (item as UIResourcePackToSort).pack.SortingOrder - 1;
+                        b = false;
+                        break;
+                    }
+                }
+                if (b) grabbed.pack.SortingOrder = (sortListIn.Elements[sortListIn.Elements.Count - 1] as UIResourcePackToSort).pack.SortingOrder + 1;
+                UpdateDisplayerToSort();
+            }
+            grabbed = null;
+        }
         public override void Update(GameTime gameTime)
         {
             if (Main.keyState.IsKeyDown(Keys.Escape))
@@ -549,6 +596,8 @@ namespace ModManager.Content.ResourcePackSelection
             }
 
             base.Update(gameTime);
+
+            if (!Main.mouseLeft && grabbed != null) LeftMouseUp(null);
 
             if (Main.keyState.PressingControl())
             {
@@ -605,10 +654,48 @@ namespace ModManager.Content.ResourcePackSelection
             }
 
             cfg.Scale = scale;
-            cfg.ScaleThreshold = scaleThreshold;
+            cfg.ScaleGrid = scaleGrid;
             cfg.ScaleText = scaleText;
 
             cfg.Save();
+        }
+        public override void DrawChildren(SpriteBatch spriteBatch)
+        {
+            base.DrawChildren(spriteBatch);
+            if (grabbed != null)
+            {
+                if (sortList.IsMouseHovering)
+                {
+                    var r = sortListIn.Elements[sortListIn.Elements.Count - 1]._outerDimensions.ToRectangle();
+                    r.Y += r.Height - 3;
+                    r.Height = 6;
+                    foreach (var item in sortListIn.Elements)
+                    {
+                        if (item._innerDimensions.Y + item._innerDimensions.Height * 0.5f >= Main.mouseY)
+                        {
+                            r = item._outerDimensions.ToRectangle();
+                            r.Y -= 3;
+                            r.Height = 6;
+                            break;
+                        }
+                    }
+                    spriteBatch.Draw(TextureAssets.BlackTile.Value, r, UIColors.ColorBorderHovered);
+                }
+                var off = new Vector2(Main.mouseX, Main.mouseY) - grabbedPos;
+
+                grabbed._dimensions.X += off.X;
+                grabbed._innerDimensions.X += off.X;
+                grabbed._outerDimensions.X += off.X;
+                grabbed._dimensions.Y += off.Y;
+                grabbed._innerDimensions.Y += off.Y;
+                grabbed._outerDimensions.Y += off.Y;
+                grabbed.RecalculateChildren();
+
+                grabbed.enableDraw = true;
+                grabbed.Draw(spriteBatch);
+
+                grabbed.Recalculate();
+            }
         }
     }
 }

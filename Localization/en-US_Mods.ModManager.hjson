@@ -71,6 +71,16 @@ Configs: {
 			Label: Filter Category Type
 			Tooltip: ""
 		}
+
+		ScaleGrid: {
+			Label: Scale Grid
+			Tooltip: ""
+		}
+
+		LockedMods: {
+			Label: Locked Mods
+			Tooltip: ""
+		}
 	}
 
 	DataConfigBrowser: {
@@ -98,6 +108,11 @@ Configs: {
 
 		ScaleThreshold: {
 			Label: Scale Threshold
+			Tooltip: ""
+		}
+
+		ScaleGrid: {
+			Label: Scale Grid
 			Tooltip: ""
 		}
 	}
@@ -151,6 +166,70 @@ Configs: {
 			Label: Scale Threshold
 			Tooltip: ""
 		}
+
+		ScaleGrid: {
+			Label: Scale Grid
+			Tooltip: ""
+		}
+	}
+
+	ColorConfig: {
+		DisplayName: Color Config
+
+		ColorBorderStatic: {
+			Label: Color Border Static
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorBorderHovered: {
+			Label: Color Border Hovered
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorBorderAllowDrop: {
+			Label: Color Border Allow Drop
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorBorderAllowDropHovered: {
+			Label: Color Border Allow Drop Hovered
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorBackgroundDisabled: {
+			Label: Color Background Disabled
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorBackgroundStatic: {
+			Label: Color Background Static
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorBackgroundHovered: {
+			Label: Color Background Hovered
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorBackgroundSelected: {
+			Label: Color Background Selected
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorNeedUpdate: {
+			Label: Color Need Update
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorInvert: {
+			Label: Color Invert
+			Tooltip: Only works when CUSTOM color theme selected
+		}
+
+		ColorSliders: {
+			Label: Color Sliders
+			Tooltip: Only works when CUSTOM color theme selected
+		}
 	}
 }
 
@@ -161,7 +240,12 @@ RenameTitle: Rename
 Cancel: Cancel
 Delete: Delete
 Remove: Remove
+Lock: Lock
+Unlock: Unlock
 Info: Info
+ViewList: List
+ViewGrid: Grid
+ViewStyle: Style
 CantLeave: Please Apply or Reject changes before leave!
 DeleteDescMod: You can download it again in Mod Browser
 DeleteDescFolder: All files will be moved to current directory

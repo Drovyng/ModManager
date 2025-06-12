@@ -77,6 +77,7 @@ namespace ModManager.Content.ModsList
                     {
                         AddAction("Info");
                         AddAction(uIMod.mod.Enabled ? "Disable" : "Enable");
+                        AddAction(uIMod.Locked ? "Unlock" : "Lock");
                         AddAction("Config", !(ModLoader.TryGetMod(UIModsNew.Instance.SelectedItem.mod.Name, out var mod) && ConfigManager.Configs.ContainsKey(mod) && ConfigManager.Configs[mod].Count > 0));
                         AddAction("Rename");
                         AddAction(UIModsNew.Instance.OpenedCollections ? "Remove" : "Delete");
@@ -85,7 +86,20 @@ namespace ModManager.Content.ModsList
                     {
                         AddAction("Enable");
                         AddAction("Disable");
+                        bool onlyMods = true;
+                        bool onlyFolders = true;
+                        foreach (var item in UIModsNew.Instance.SelectedItems)
+                        {
+                            if (item.mod == null) onlyMods = false;
+                            else onlyFolders = false;
+                        }
+                        if (onlyMods)
+                        {
+                            AddAction("Lock");
+                            AddAction("Unlock");
+                        }
                         if (UIModsNew.Instance.OpenedCollections) AddAction("Remove");
+                        else if (onlyMods || onlyFolders) AddAction("Delete");
                     }
                 }
             }
@@ -274,7 +288,6 @@ namespace ModManager.Content.ModsList
                     UIModsNew.Instance.popupRename.Popup(UIModsNew.Instance.SelectedCollection.Text.text, UIModsNew.Instance.SelectedCollection.Text.text, RenameCollection);
                     return;
                 case "Delete":
-                    if (UIModsNew.Instance.SelectedItem == null) return;
                     UIModsNew.Instance.popupSureDelete.Popup();
                     return;
                 case "DeleteCollection":
@@ -309,6 +322,18 @@ namespace ModManager.Content.ModsList
                     foreach (var item in UIModsNew.Instance.SelectedItems)
                     {
                         if (item.mod != null) item.Set(false);
+                    }
+                    return;
+                case "Lock":
+                    foreach (var item in UIModsNew.Instance.SelectedItems)
+                    {
+                        if (item.mod != null) item.Lock(true);
+                    }
+                    return;
+                case "Unlock":
+                    foreach (var item in UIModsNew.Instance.SelectedItems)
+                    {
+                        if (item.mod != null) item.Lock(false);
                     }
                     return;
             }

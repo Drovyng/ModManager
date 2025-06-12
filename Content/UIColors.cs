@@ -37,6 +37,7 @@ namespace ModManager.Content
 
             ColorInvert = Color.Black;
             ColorSliders = Color.White;
+            SetToCustomConfig();
         }
         public static void SetLight()
         {
@@ -55,6 +56,7 @@ namespace ModManager.Content
 
             ColorInvert = Color.Gray;
             ColorSliders = Color.White;
+            SetToCustomConfig();
         }
         public static void SetDark()
         {
@@ -73,6 +75,46 @@ namespace ModManager.Content
 
             ColorInvert = Color.Gray;
             ColorSliders = Color.White;
+            SetToCustomConfig();
+        }
+        public static void SetCustom()
+        {
+            var c = ColorConfig.Instance;
+            ColorBorderStatic           = c.ColorBorderStatic;
+            ColorBorderHovered          = c.ColorBorderHovered;
+                                        
+            ColorBorderAllowDrop        = c.ColorBorderAllowDrop;
+            ColorBorderAllowDropHovered = c.ColorBorderAllowDropHovered;
+                                        
+            ColorBackgroundDisabled     = c.ColorBackgroundDisabled;
+            ColorBackgroundStatic       = c.ColorBackgroundStatic;
+            ColorBackgroundHovered      = c.ColorBackgroundHovered;
+            ColorBackgroundSelected     = c.ColorBackgroundSelected;
+                                        
+            ColorNeedUpdate             = c.ColorNeedUpdate;
+                                        
+            ColorInvert                 = c.ColorInvert;
+            ColorSliders                = c.ColorSliders;
+        }
+        public static void SetToCustomConfig()
+        {
+            var c = ColorConfig.Instance;
+            c.ColorBorderStatic           = ColorBorderStatic;
+            c.ColorBorderHovered          = ColorBorderHovered;
+                                     
+            c.ColorBorderAllowDrop        = ColorBorderAllowDrop;
+            c.ColorBorderAllowDropHovered = ColorBorderAllowDropHovered;
+                                       
+            c.ColorBackgroundDisabled     = ColorBackgroundDisabled;
+            c.ColorBackgroundStatic       = ColorBackgroundStatic;
+            c.ColorBackgroundHovered      = ColorBackgroundHovered;
+            c.ColorBackgroundSelected     = ColorBackgroundSelected;
+                                       
+            c.ColorNeedUpdate             = ColorNeedUpdate;
+                                      
+            c.ColorInvert                 = ColorInvert;
+            c.ColorSliders                = ColorSliders;
+            c.Save();
         }
         public static void SetConfig()
         {
@@ -83,6 +125,9 @@ namespace ModManager.Content
                     return;
                 case ManagerConfigTheme.Dark:
                     SetDark();
+                    return;
+                case ManagerConfigTheme.Custom:
+                    SetCustom();
                     return;
                 default:
                     SetBlue();

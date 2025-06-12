@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using Microsoft.Xna.Framework;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
@@ -18,6 +19,7 @@ namespace ModManager.Content
         public int[] CategoriesSizes = [90, -96, -12, -118];
 
         public List<string> Folders = new List<string>();
+        public List<string> LockedMods = new List<string>();
         public List<string> ConfigCollections = new List<string>();
         public Dictionary<string, string> ModPaths = new Dictionary<string, string>();
         public Dictionary<string, string> ModNames = new Dictionary<string, string>();
@@ -27,8 +29,8 @@ namespace ModManager.Content
         public float Scale = 1;
         [DefaultValue(1f)]
         public float ScaleText = 1;
-        [DefaultValue(3f)]
-        public float ScaleThreshold = 3;
+        [DefaultValue(false)]
+        public bool ScaleGrid = false;
 
         [DefaultValue(1)]
         public int FilterCategory;
@@ -53,8 +55,8 @@ namespace ModManager.Content
         public float Scale = 1;
         [DefaultValue(1f)]
         public float ScaleText = 1;
-        [DefaultValue(3f)]
-        public float ScaleThreshold = 3;
+        [DefaultValue(false)]
+        public bool ScaleGrid = false;
 
         public void Save()
         {
@@ -74,8 +76,34 @@ namespace ModManager.Content
         public float Scale = 1;
         [DefaultValue(1f)]
         public float ScaleText = 1;
-        [DefaultValue(3f)]
-        public float ScaleThreshold = 3;
+        [DefaultValue(false)]
+        public bool ScaleGrid = false;
+
+        public void Save()
+        {
+            ConfigManager.Save(this);
+        }
+    }
+    public class ColorConfig : ModConfig
+    {
+        public static ColorConfig Instance => ModContent.GetInstance<ColorConfig>();
+        public override ConfigScope Mode => ConfigScope.ClientSide;
+
+        public Color ColorBorderStatic;
+        public Color ColorBorderHovered;
+              
+        public Color ColorBorderAllowDrop;
+        public Color ColorBorderAllowDropHovered;
+              
+        public Color ColorBackgroundDisabled;
+        public Color ColorBackgroundStatic;
+        public Color ColorBackgroundHovered;
+        public Color ColorBackgroundSelected;
+              
+        public Color ColorNeedUpdate;
+              
+        public Color ColorInvert;
+        public Color ColorSliders;
 
         public void Save()
         {
