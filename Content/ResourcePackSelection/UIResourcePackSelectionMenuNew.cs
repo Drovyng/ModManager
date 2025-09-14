@@ -37,6 +37,9 @@ namespace ModManager.Content.ResourcePackSelection
         public UIDoNotDrawNonArea mainListIn;
         public UIScrollbar mainScrollbar;
 
+        public UIPanelStyled searchFieldOut;
+        public UIInputTextFieldPriority<LocalizedText> searchField;
+
         public UIList sortList;
         public UIDoNotDrawNonArea sortListIn;
         public UIScrollbar sortScrollbar;
@@ -72,6 +75,8 @@ namespace ModManager.Content.ResourcePackSelection
         {
             Elements.Clear();
 
+            Append(new UIMMTopPanel());
+
             root = new()
             {
                 Width = { Pixels = MathF.Max(DataConfigResourcePack.Instance.RootSize[0], 400) },
@@ -94,7 +99,7 @@ namespace ModManager.Content.ResourcePackSelection
             {
                 Width = { Precent = 0.7f },
                 Height = { Pixels = 32 },
-                Top = { Pixels = 100 },
+                Top = { Pixels = 132 },
                 Left = { Precent = 0.3f }
             };
             categoriesHorizontalOut.SetPadding(0);
@@ -108,12 +113,37 @@ namespace ModManager.Content.ResourcePackSelection
             };
             categoriesHorizontalOut.Append(categoriesHorizontal);
 
+
+            searchFieldOut = new()
+            {
+                Width = { Precent = 0.7f },
+                Height = { Pixels = 32 },
+                Left = { Precent = 0.3f },
+                Top = { Pixels = 100 }
+            };
+            searchFieldOut.SetPadding(0);
+            searchField = new(ModManager.Get("SearchResourcePacksHint"), 0)
+            {
+                Top = { Pixels = 5f },
+                Height = { Percent = 1f },
+                Width = { Percent = 1f },
+                Left = { Pixels = 5f },
+                VAlign = 0.5f
+            };
+            searchField.OnTextChange += (v, e) =>
+            {
+                UpdateDisplayed();
+            };
+            searchFieldOut.Append(searchField);
+            root.Append(searchFieldOut);
+
+
             var main = new UIPanelStyled()
             {
                 Width = { Precent = 0.7f },
-                Height = { Precent = 1, Pixels = -132 },
+                Height = { Precent = 1, Pixels = -164 },
                 HAlign = 1,
-                Top = { Pixels = 132 }
+                Top = { Pixels = 164 }
             }; main.SetPadding(0);
             mainScrollbar = new UIScrollbar()
             {
@@ -378,6 +408,12 @@ namespace ModManager.Content.ResourcePackSelection
             }
             AddCategories();
         }
+        public bool IsResourcePackFiltered(UIResourcePackNew item)
+        {
+            var s = searchField._currentString.ToLower();
+            if (s.Length == 0) return true;
+            return item.textName.text.ToLower().Contains(s) || item.textAuthor.text.ToLower().Contains(s);
+        }
         public override void OnActivate()
         {
             ToUndo = new();
@@ -406,7 +442,7 @@ namespace ModManager.Content.ResourcePackSelection
         public void UpdateDisplayed()
         {
             mainListIn.Elements.Clear();
-            var list = uIResourcePacks.ToList();
+            var list = uIResourcePacks.Where(IsResourcePackFiltered).ToList();
             list.Sort((left, right) => { return left.Sort(right, FilterCategory, FilterCategoryType); });
             foreach (var item in list)
             {

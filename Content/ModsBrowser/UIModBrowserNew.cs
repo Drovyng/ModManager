@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using ModManager.Content.ModsList;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.ModLoader.Core;
@@ -60,7 +61,7 @@ namespace ModManager.Content.ModsBrowser
         {
             "Name", "Author", "Date", ""
         };
-        
+
         public UIModBrowserNew(SocialBrowserModule socialBackend) : base(socialBackend)
         {
             Instance = this;
@@ -130,7 +131,7 @@ namespace ModManager.Content.ModsBrowser
                         text = ModManager.Get(item),
                         align = 0.5f
                     }); int j = i;
-                    p.OnUpdate += delegate { 
+                    p.OnUpdate += delegate {
                         p.BackgroundColor = currentFiltersSet == j ? UIColors.ColorBackgroundSelected : (j == 2 ? UIColors.ColorBackgroundDisabled : (p.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic));
                         p.BorderColor = currentFiltersSet == j ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
                     };
@@ -291,7 +292,10 @@ namespace ModManager.Content.ModsBrowser
                 ontopSettings.Append(buttonGridScale);
                 topPanel.Append(ontopSettings);
             }
-            void NeedUpdate() { needUpdate = true; }
+            void NeedUpdate() {
+                if (_specialModPackFilter == null) needUpdate = true;
+                else UpdateDisplayed();
+            }
             {
                 var ontopFilters = new UIPanelStyled()
                 {
@@ -312,7 +316,7 @@ namespace ModManager.Content.ModsBrowser
                     Left = { Pixels = 8 },
                     Top = { Pixels = 4 }
                 };
-                FilterTextBox.OnTextChange += delegate { needUpdate = true; };
+                FilterTextBox.OnTextChange += delegate { NeedUpdate(); };
                 textBoxOut.Append(FilterTextBox);
                 ontopFilters.Append(textBoxOut);
 
@@ -449,7 +453,6 @@ namespace ModManager.Content.ModsBrowser
             AddCategories();
             UpdateDisplayed();
         }
-
         public void SetFiltersSet(int f)
         {
             if (f == 1)
@@ -554,11 +557,19 @@ namespace ModManager.Content.ModsBrowser
 
             cfg.Save();
         }
+        public bool IsModFiltered(UIModBrowserItemNew item)
+        {
+            if (!item._isInitialized) item.Activate();
+            var s = Filter.ToLower();
+            if (s.Length == 0) return true;
+            return (item.textName.text != null && item.textName.text.ToLower().Contains(s)) || (item.textAuthor.text != null && item.textAuthor.text.ToLower().Contains(s));
+        }
         public void UpdateDisplayed()
         {
             mainListIn.Elements.Clear();
             foreach (var item in ModsList.Items)
             {
+                if (_specialModPackFilter != null && !IsModFiltered(item as UIModBrowserItemNew)) continue;
                 mainListIn.Append(item);
                 item.Activate();
             }

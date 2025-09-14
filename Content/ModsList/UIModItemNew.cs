@@ -379,6 +379,7 @@ namespace ModManager.Content.ModsList
         public void Lock(bool? enabled = null, bool check = true)
         {
             enabled ??= !Locked;
+            if (enabled == false) enabled = cantUseText != null;
             Locked = enabled.Value;
             toggleLock.Color = enabled.Value ? Color.White : Color.Transparent;
             if (enabled == true)

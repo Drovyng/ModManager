@@ -94,7 +94,7 @@ namespace ModManager.Content.ModsList
                 align = 0.5f,
                 text = ModManager.Get("Apply")
             };
-            ApplyBG = ApplyBG.WithFadedMouseOver();
+            ApplyBG = ApplyBG.FadedMouseOver();
             ApplyBG.Append(Apply);
             Append(ApplyBG);
 
@@ -114,7 +114,7 @@ namespace ModManager.Content.ModsList
                 align = 0.5f,
                 text = ModManager.Get("Cancel")
             };
-            CancelBG = CancelBG.WithFadedMouseOver();
+            CancelBG = CancelBG.FadedMouseOver();
             CancelBG.Append(Cancel);
             Append(CancelBG);
 

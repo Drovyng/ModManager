@@ -49,5 +49,9 @@ namespace ModManager.Content
                 Utils.DrawBorderString(spriteBatch, text, new Vector2(dimensions.X, dimensions.Y), Color.White);
             }
         }
+        public override void RightMouseDown(UIMouseEvent evt)
+        {
+            if (UIInputTextFieldPriority.MaxPriority == Priority) Text = "";
+        }
     }
 }

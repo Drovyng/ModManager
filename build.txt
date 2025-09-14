@@ -1,6 +1,6 @@
 displayName = Mod Manager
 author = Drovyng
-version = 2.0.0.0
+version = 2.0.1.6
 side = Client
 homepage = https://github.com/Drovyng/ModManager
 sortBefore = ConciseModList, SmartModManagement, ModSideIcon, CompactMods, ModFolder, CompatChecker, CWRMod

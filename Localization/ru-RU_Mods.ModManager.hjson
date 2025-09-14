@@ -263,6 +263,7 @@ ButtonApplyChanges: Применить Изменения
 ButtonRejectChanges: Отклонить Изменения
 ButtonInfo: Информация
 SearchModsHint: Введите для поиска модов
+SearchResourcePacksHint: Введите для поиска наборов ресурсов
 NumberElements: Элементов
 NumberSelected: Выделено
 NumberEnabled: Включено

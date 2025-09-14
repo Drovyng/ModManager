@@ -92,7 +92,6 @@ namespace ModManager
             Interface.modsMenu = new UIModsNew();
             Interface.modBrowser = new UIModBrowserNew(Interface.modBrowser.SocialBackend);
             Interface.modPacksMenu.Append(new UIMMTopPanel());
-            Interface.modSources.Append(new UIMMTopPanel());
 
             if (ManagerConfig.Instance.ModLoadingUpgrade && !(Interface.loadMods.Elements[Interface.loadMods.Elements.Count - 1] is UIPanel))
             {

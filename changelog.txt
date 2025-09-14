@@ -1,17 +1,7 @@
-Double click on mod to enable/disable
-Double click to download mod
-Drag ResourcePacks to sort
-
-Replaced Threshold with Grid/List style buttons
-
-Added Fully Customizable Color Scheme
-Added multi delete context action
-
-Maybe fixed folders bug
-
-Added mod locking (you cant disable/enable it when its locked) by middle mouse button or context menu action
-
-Updated every video in showcase and added 2 new!
-Also videos are now hosted on github, cause not everyone can see stuff from imgur.
-
-[h1]FULL RELEASE!!!!!![/h1]
+Fixed mod renaming
+Added search bar in ResourcePachSelectionMenu
+Updated top bar
+Fixed colored buttons in popups
+Fixed and Optimized searching in workshop
+Right click now clears search bar
+Fixed visual bug when locking mods

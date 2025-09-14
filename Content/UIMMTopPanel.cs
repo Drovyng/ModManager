@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using ModManager.Content.ResourcePackSelection;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -16,7 +17,7 @@ namespace ModManager.Content
         public UIPanelStyled buttonMods;
         public UIPanelStyled buttonModBrowser;
         public UIPanelStyled buttonModPacks;
-        public UIPanelStyled buttonModDevelop;
+        public UIPanelStyled buttonResourcePacks;
         public override void OnInitialize()
         {
             SetPadding(0);
@@ -62,15 +63,16 @@ namespace ModManager.Content
             buttonModPacks.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
             Append(buttonModPacks);
 
-            buttonModDevelop = new UIPanelStyled().FadedMouseOver();
-            buttonModDevelop.Height.Precent = 1;
-            buttonModDevelop.Append(new UIText(Language.GetText("tModLoader.MenuDevelopMods"), 0.6f, true)
+            buttonResourcePacks = new UIPanelStyled().FadedMouseOver();
+            buttonResourcePacks.Height.Precent = 1;
+            buttonResourcePacks.Append(new UIText(Language.GetText("UI.ResourcePacks"), 0.6f, true)
             {
                 Width = { Precent = 1 }, Height = { Precent = 1 }, TextOriginX = 0.5f, TextOriginY = 0.5f
-            }); buttonModDevelop.SetPadding(0);
-            buttonModDevelop.OnLeftClick += (_, _) => { Click(Interface.modSources); };
-            buttonModDevelop.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
-            Append(buttonModDevelop);
+            }); buttonResourcePacks.SetPadding(0);
+            buttonResourcePacks.OnLeftClick += (_, _) => { Main.OpenResourcePacksMenu(Main.MenuUI._currentState); };
+            buttonResourcePacks.OnMouseOver += (_, _) => { SoundEngine.PlaySound(SoundID.MenuTick); };
+            Append(buttonResourcePacks);
+            
         }
 
         public override void OnActivate()
@@ -80,7 +82,7 @@ namespace ModManager.Content
             buttonMods.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.MenuManageMods")).X * 0.6f;
             buttonModBrowser.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.MenuModBrowser")).X * 0.6f;
             buttonModPacks.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.ModsModPacks")).X * 0.6f;
-            buttonModDevelop.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("tModLoader.MenuDevelopMods")).X * 0.6f;
+            buttonResourcePacks.Width.Pixels = 16 + f.MeasureString(Language.GetTextValue("UI.ResourcePacks")).X * 0.6f;
 
             Width.Pixels = buttonBack.Width.Pixels;
             buttonMods.Left.Pixels = Width.Pixels;
@@ -92,8 +94,8 @@ namespace ModManager.Content
             buttonModPacks.Left.Pixels = Width.Pixels;
             Width.Pixels += buttonModPacks.Width.Pixels;
 
-            buttonModDevelop.Left.Pixels = Width.Pixels;
-            Width.Pixels += buttonModDevelop.Width.Pixels;
+            buttonResourcePacks.Left.Pixels = Width.Pixels;
+            Width.Pixels += buttonResourcePacks.Width.Pixels;
 
             Left.Set(Width.Pixels * -0.5f, 0.5f);
 
@@ -104,14 +106,14 @@ namespace ModManager.Content
             buttonMods.BorderColor = Main.MenuUI._currentState == Interface.modsMenu ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
             buttonModBrowser.BorderColor = Main.MenuUI._currentState == Interface.modBrowser ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
             buttonModPacks.BorderColor = Main.MenuUI._currentState == Interface.modPacksMenu ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
-            buttonModDevelop.BorderColor = Main.MenuUI._currentState == Interface.modSources ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
+            buttonResourcePacks.BorderColor = Main.MenuUI._currentState == Interface.modSources ? UIColors.ColorBorderHovered : UIColors.ColorBorderStatic;
 
             buttonBack.BackgroundColor = buttonBack.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic;
             buttonMods.BackgroundColor = Main.MenuUI._currentState == Interface.modsMenu ? UIColors.ColorBackgroundSelected : (buttonMods.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
             buttonModBrowser.BackgroundColor = Main.MenuUI._currentState == Interface.modBrowser ? UIColors.ColorBackgroundSelected : (buttonModBrowser.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
             buttonModPacks.BackgroundColor = Main.MenuUI._currentState == Interface.modPacksMenu ? UIColors.ColorBackgroundSelected : (buttonModPacks.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
-            buttonModDevelop.BackgroundColor = Main.MenuUI._currentState == Interface.modSources ? UIColors.ColorBackgroundSelected : (buttonModDevelop.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
-
+            buttonResourcePacks.BackgroundColor = (Main.MenuUI._currentState is UIResourcePackSelectionMenuNew) ? UIColors.ColorBackgroundSelected : (buttonResourcePacks.IsMouseHovering ? UIColors.ColorBackgroundHovered : UIColors.ColorBackgroundStatic);
+            
             base.Update(gameTime);
         }
         public void Click(UIState need)

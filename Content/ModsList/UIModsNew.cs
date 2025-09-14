@@ -102,6 +102,7 @@ namespace ModManager.Content.ModsList
             EnableMods,
             DisableMods,
             RenameMod,
+            RenameModFromNothing,
             RenameFolder,
             Move,
             ChangedFolders
@@ -148,7 +149,10 @@ namespace ModManager.Content.ModsList
             if (SelectedItem.mod != null)
             {
                 ToRedo.Clear();
-                ToUndo.Add((UndoRedoEnum.RenameMod, (SelectedItem.mod.Name, DataConfig.Instance.ModNames[SelectedItem.mod.Name])));
+                if (DataConfig.Instance.ModNames.ContainsKey(SelectedItem.mod.Name))
+                    ToUndo.Add((UndoRedoEnum.RenameMod, (SelectedItem.mod.Name, DataConfig.Instance.ModNames[SelectedItem.mod.Name])));
+                else
+                    ToUndo.Add((UndoRedoEnum.RenameModFromNothing, SelectedItem.mod.Name));
                 DataConfig.Instance.ModNames[SelectedItem.mod.Name] = value;
             }
             else
@@ -346,7 +350,7 @@ namespace ModManager.Content.ModsList
                 Width = { Percent = 1f },
                 Left = { Pixels = 5f },
                 VAlign = 0.5f
-            };
+            };;
             searchField.OnTextChange += (v, e) =>
             {
                 UpdateDisplayed();

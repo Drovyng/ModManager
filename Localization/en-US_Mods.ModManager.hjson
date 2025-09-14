@@ -263,6 +263,7 @@ ButtonApplyChanges: Apply Changes
 ButtonRejectChanges: Reject Changes
 ButtonInfo: Mod Info
 SearchModsHint: Type to search mods
+SearchResourcePacksHint: Type to search resource packs
 NumberElements: Elements
 NumberSelected: Selected
 NumberEnabled: Enabled
